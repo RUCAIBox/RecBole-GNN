@@ -1,0 +1,4 @@
+embedding_size: 64
+split_to: 0
+reg_weights: [1e-2, 1e-2]
+alpha: 0
