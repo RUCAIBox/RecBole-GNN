@@ -1,0 +1,7 @@
+eval_args:
+  split: {'LS': 'valid_and_test'}
+  order: TO
+  mode: uni100
+metrics: ['AUC', 'LogLoss']
+valid_metric: AUC
+repeatable: True
