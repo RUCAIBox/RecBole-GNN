@@ -1,0 +1,6 @@
+embedding_size: 64
+dropout_prob: 0.4
+reg_weight: 1e-4
+nv: 8
+nh: 16
+loss_type: 'CE'

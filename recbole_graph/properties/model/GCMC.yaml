@@ -1,0 +1,7 @@
+accum: "stack"
+gcn_output_dim: 500
+embedding_size: 64
+dropout_prob: 0.3
+sparse_feature: True
+class_num: 2
+num_basis_functions: 2
