@@ -3,7 +3,7 @@ import torch
 from recbole.data.dataset import SequentialDataset
 
 
-class SRGNNDataset(SequentialDataset):
+class SessionGraphDataset(SequentialDataset):
     def __init__(self, config):
         super().__init__(config)
 
@@ -36,3 +36,11 @@ class SRGNNDataset(SequentialDataset):
         for dataset in datasets:
             dataset.session_graph_construction()
         return datasets
+
+
+class SRGNNDataset(SessionGraphDataset):
+    pass
+
+
+class GCSANDataset(SessionGraphDataset):
+    pass
