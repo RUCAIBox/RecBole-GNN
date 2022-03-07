@@ -44,3 +44,7 @@ class SRGNNDataset(SessionGraphDataset):
 
 class GCSANDataset(SessionGraphDataset):
     pass
+
+
+class NISERDataset(SessionGraphDataset):
+    pass

@@ -1,0 +1,6 @@
+embedding_size: 64
+step: 1
+sigma: 16
+item_dropout: 0.1
+loss_type: 'CE'
+transform: sess_graph
