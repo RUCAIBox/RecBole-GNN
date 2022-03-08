@@ -19,28 +19,23 @@ class GCNConv(MessagePassing):
 
 
 class SRGNNConv(MessagePassing):
-    def __init__(self, dim, bias=True):
+    def __init__(self, dim):
         super(SRGNNConv, self).__init__(aggr='mean')
-        self.bias = bias
 
         self.lin = torch.nn.Linear(dim, dim)
-        if bias:
-            self.b = nn.Parameter(torch.Tensor(dim))
+        self.b = nn.Parameter(torch.Tensor(dim))
 
     def forward(self, x, edge_index):
         x = self.lin(x)
-        res = self.propagate(edge_index, x=x)
-        if self.bias:
-            res = res + self.b
-        return res
+        return self.propagate(edge_index, x=x) + self.b
 
 
 class SRGNNCell(nn.Module):
-    def __init__(self, dim, bias=True):
+    def __init__(self, dim):
         super(SRGNNCell, self).__init__()
 
-        self.incomming_conv = SRGNNConv(dim, bias)
-        self.outcomming_conv = SRGNNConv(dim, bias)
+        self.incomming_conv = SRGNNConv(dim)
+        self.outcomming_conv = SRGNNConv(dim)
 
         self.lin_ih = nn.Linear(2 * dim, 3 * dim)
         self.lin_hh = nn.Linear(dim, 3 * dim)

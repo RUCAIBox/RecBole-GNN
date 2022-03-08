@@ -55,7 +55,7 @@ class GCSAN(SequentialRecommender):
         self.item_embedding = nn.Embedding(self.n_items, self.hidden_size, padding_idx=0)
 
         # define layers and loss
-        self.gnncell = SRGNNCell(self.hidden_size, bias=False)
+        self.gnncell = SRGNNCell(self.hidden_size)
         self.self_attention = TransformerEncoder(
             n_layers=self.n_layers,
             n_heads=self.n_heads,
