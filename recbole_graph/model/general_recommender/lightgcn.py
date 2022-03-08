@@ -6,7 +6,7 @@ from recbole.model.loss import BPRLoss, EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import GeneralGraphRecommender
-from recbole_graph.model.layers import GCNConv
+from recbole_graph.model.layers import LightGCNConv
 
 
 class LightGCN(GeneralGraphRecommender):
@@ -31,7 +31,7 @@ class LightGCN(GeneralGraphRecommender):
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.latent_dim)
         self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.latent_dim)
-        self.gcn_conv = GCNConv(dim=self.latent_dim)
+        self.gcn_conv = LightGCNConv(dim=self.latent_dim)
         self.mf_loss = BPRLoss()
         self.reg_loss = EmbLoss()
 

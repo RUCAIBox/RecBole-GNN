@@ -22,7 +22,7 @@ from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import GeneralGraphRecommender
-from recbole_graph.model.layers import GCNConv
+from recbole_graph.model.layers import LightGCNConv
 
 
 class SGL(GeneralGraphRecommender):
@@ -57,7 +57,7 @@ class SGL(GeneralGraphRecommender):
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(self.n_users, self.latent_dim)
         self.item_embedding = torch.nn.Embedding(self.n_items, self.latent_dim)
-        self.gcn_conv = GCNConv(dim=self.latent_dim)
+        self.gcn_conv = LightGCNConv(dim=self.latent_dim)
         self.reg_loss = EmbLoss()
 
         # storage variables for full sort evaluation acceleration
