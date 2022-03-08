@@ -1,9 +1,8 @@
 from logging import getLogger
-from recbole.data import data_preparation
 from recbole.utils import init_logger, get_trainer, init_seed, set_color
 
 from recbole_graph.config import Config
-from recbole_graph.utils import create_dataset, get_model
+from recbole_graph.utils import create_dataset, data_preparation, get_model
 
 
 def run_recbole_graph(model=None, dataset=None, config_file_list=None, config_dict=None, saved=True):
