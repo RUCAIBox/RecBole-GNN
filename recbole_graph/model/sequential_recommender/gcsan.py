@@ -11,56 +11,13 @@ Reference:
 
 """
 
-import numpy as np
 import torch
 from torch import nn
-from torch_geometric.nn import MessagePassing
 from recbole.model.abstract_recommender import SequentialRecommender
 from recbole.model.layers import TransformerEncoder
 from recbole.model.loss import EmbLoss, BPRLoss
 
-
-class GNNConv(MessagePassing):
-    def __init__(self, dim):
-        super(GNNConv, self).__init__(aggr='mean')
-        self.lin = torch.nn.Linear(dim, dim)
-
-    def forward(self, x, edge_index):
-        x = self.lin(x)
-        return self.propagate(edge_index, x=x)
-
-
-class GNNCell(nn.Module):
-    def __init__(self, dim):
-        super(GNNCell, self).__init__()
-        self.dim = dim
-        self.incomming_conv = GNNConv(dim)
-        self.outcomming_conv = GNNConv(dim)
-        self.lin_ih = nn.Linear(2 * dim, 3 * dim)
-        self.lin_hh = nn.Linear(dim, 3 * dim)
-
-        self._reset_parameters()
-
-    def forward(self, hidden, edge_index):
-        input_in = self.incomming_conv(hidden, edge_index)
-        reversed_edge_index = torch.flip(edge_index, dims=[0])
-        input_out = self.outcomming_conv(hidden, reversed_edge_index)
-        inputs = torch.cat([input_in, input_out], dim=-1)
-
-        gi = self.lin_ih(inputs)
-        gh = self.lin_hh(hidden)
-        i_r, i_i, i_n = gi.chunk(3, -1)
-        h_r, h_i, h_n = gh.chunk(3, -1)
-        reset_gate = torch.sigmoid(i_r + h_r)
-        input_gate = torch.sigmoid(i_i + h_i)
-        new_gate = torch.tanh(i_n + reset_gate * h_n)
-        hy = (1 - input_gate) * hidden + input_gate * new_gate
-        return hy
-
-    def _reset_parameters(self):
-        stdv = 1.0 / np.sqrt(self.dim)
-        for weight in self.parameters():
-            weight.data.uniform_(-stdv, stdv)
+from recbole_graph.model.layers import SRGNNCell
 
 
 class GCSAN(SequentialRecommender):
@@ -98,7 +55,7 @@ class GCSAN(SequentialRecommender):
         self.item_embedding = nn.Embedding(self.n_items, self.hidden_size, padding_idx=0)
 
         # define layers and loss
-        self.gnncell = GNNCell(self.hidden_size)
+        self.gnncell = SRGNNCell(self.hidden_size, bias=False)
         self.self_attention = TransformerEncoder(
             n_layers=self.n_layers,
             n_heads=self.n_heads,
