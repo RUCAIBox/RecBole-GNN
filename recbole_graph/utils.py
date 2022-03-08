@@ -7,6 +7,7 @@ from recbole.data.utils import create_dataset as create_recbole_dataset
 from recbole.data.utils import data_preparation as recbole_data_preparation
 from recbole.utils import set_color
 from recbole.utils import get_model as get_recbole_model
+from recbole.utils import get_trainer as get_recbole_trainer
 from recbole.utils.argument_list import dataset_arguments
 
 from recbole_graph.data.dataloader import CustomizedTrainDataLoader, CustomizedFullSortEvalDataLoader
@@ -130,3 +131,16 @@ def data_preparation(config, dataset):
         return train_data, valid_data, test_data
     else:
         return recbole_data_preparation(config, dataset)
+
+def get_trainer(model_type, model_name):
+    r"""Automatically select trainer class based on model type and model name
+    Args:
+        model_type (ModelType): model type
+        model_name (str): model name
+    Returns:
+        Trainer: trainer class
+    """
+    try:
+        return getattr(importlib.import_module('recbole_graph.trainer'), model_name + 'Trainer')
+    except AttributeError:
+        return get_recbole_trainer(model_type, model_name)
