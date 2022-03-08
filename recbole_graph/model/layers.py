@@ -20,6 +20,7 @@ class GCNConv(MessagePassing):
 
 class SRGNNConv(MessagePassing):
     def __init__(self, dim):
+        # mean aggregation to incorporate weight naturally
         super(SRGNNConv, self).__init__(aggr='mean')
 
         self.lin = torch.nn.Linear(dim, dim)
