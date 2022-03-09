@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time   : 2020/7/16
-# @Author : Zihan Lin
-# @Email  : linzihan.super@foxmail.com
-
-# UPDATE:
-# @Time   : 2020/9/16
-# @Author : Shanlei Mu
-# @Email  : slmu@ruc.edu.cn
-
 # @Time   : 2022/3/8
 # @Author : Changxin Tian
 # @Email  : cx.tian@outlook.com
