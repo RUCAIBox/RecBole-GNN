@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
 from torch_geometric.nn import MessagePassing
+from torch_geometric.utils import add_self_loops
 
 
-class GCNConv(MessagePassing):
+class LightGCNConv(MessagePassing):
     def __init__(self, dim):
-        super(GCNConv, self).__init__(aggr='add')
+        super(LightGCNConv, self).__init__(aggr='add')
         self.dim = dim
 
     def forward(self, x, edge_index, edge_weight):
@@ -16,6 +17,35 @@ class GCNConv(MessagePassing):
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, self.dim)
+
+
+class BiGNNConv(MessagePassing):
+    r"""Propagate a layer of Bi-interaction GNN
+
+    .. math::
+        output = (L+I)EW_1 + LE \otimes EW_2
+    """
+    def __init__(self, in_channels, out_channels):
+        super().__init__(aggr='add')
+        self.in_channels, self.out_channels = in_channels, out_channels
+        self.lin1 = torch.nn.Linear(in_channels, out_channels)
+        self.lin2 = torch.nn.Linear(in_channels, out_channels)
+
+    def forward(self, x, edge_index, edge_weight):
+        return self.propagate(edge_index, x=x, edge_weight=edge_weight)
+
+    def message(self, x_i, x_j, edge_weight):
+        x_trans = self.lin1(x_j)
+        x_inter = self.lin2(torch.mul(x_j, x_i))
+        x = x_trans + x_inter
+        x_prop = edge_weight.view(-1, 1) * x
+        return x_prop
+
+    def update(self, aggr_out, x):
+        return aggr_out + self.lin1(x)
+
+    def __repr__(self):
+        return '{}({},{})'.format(self.__class__.__name__, self.in_channels, self.out_channels)
 
 
 class SRGNNConv(MessagePassing):

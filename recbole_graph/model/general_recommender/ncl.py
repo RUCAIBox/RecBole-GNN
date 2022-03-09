@@ -16,7 +16,7 @@ from recbole.model.loss import BPRLoss, EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import GeneralGraphRecommender
-from recbole_graph.model.layers import GCNConv
+from recbole_graph.model.layers import LightGCNConv
 
 
 class NCL(GeneralGraphRecommender):
@@ -42,7 +42,7 @@ class NCL(GeneralGraphRecommender):
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.latent_dim)
         self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.latent_dim)
-        self.gcn_conv = GCNConv(dim=self.latent_dim)
+        self.gcn_conv = LightGCNConv(dim=self.latent_dim)
         self.mf_loss = BPRLoss()
         self.reg_loss = EmbLoss()
 
@@ -94,11 +94,11 @@ class NCL(GeneralGraphRecommender):
     def forward(self):
         all_embeddings = self.get_ego_embeddings()
         embeddings_list = [all_embeddings]
-        for layer_idx in range(max(self.n_layers, self.hyper_layers*2)):
+        for layer_idx in range(max(self.n_layers, self.hyper_layers * 2)):
             all_embeddings = self.gcn_conv(all_embeddings, self.edge_index, self.edge_weight)
             embeddings_list.append(all_embeddings)
 
-        lightgcn_all_embeddings = torch.stack(embeddings_list[:self.n_layers+1], dim=1)
+        lightgcn_all_embeddings = torch.stack(embeddings_list[:self.n_layers + 1], dim=1)
         lightgcn_all_embeddings = torch.mean(lightgcn_all_embeddings, dim=1)
 
         user_all_embeddings, item_all_embeddings = torch.split(lightgcn_all_embeddings, [self.n_users, self.n_items])
