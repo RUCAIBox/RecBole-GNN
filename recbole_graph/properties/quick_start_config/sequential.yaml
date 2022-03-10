@@ -3,3 +3,4 @@ eval_args:
   order: TO
   mode: full
 repeatable: True
+neg_sampling: ~

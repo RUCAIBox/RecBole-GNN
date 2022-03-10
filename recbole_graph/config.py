@@ -1,3 +1,6 @@
+import os
+
+from recbole.config.configurator import Config as RecBole_Config
 from recbole.utils import ModelType
 from recbole_graph.utils import get_model
 
