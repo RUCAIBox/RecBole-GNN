@@ -1,0 +1,6 @@
+embedding_size: 64
+n_layers: 4
+batch_norm: True
+feat_drop: 0.2
+loss_type: CE
+transform: sess_graph
