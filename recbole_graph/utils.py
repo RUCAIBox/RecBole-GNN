@@ -5,7 +5,7 @@ from logging import getLogger
 from recbole.data.utils import load_split_dataloaders, create_samplers, save_split_dataloaders
 from recbole.data.utils import create_dataset as create_recbole_dataset
 from recbole.data.utils import data_preparation as recbole_data_preparation
-from recbole.utils import set_color
+from recbole.utils import set_color, Enum
 from recbole.utils import get_model as get_recbole_model
 from recbole.utils import get_trainer as get_recbole_trainer
 from recbole.utils.argument_list import dataset_arguments
@@ -24,8 +24,11 @@ def create_dataset(config):
         Dataset: Constructed dataset.
     """
     dataset_module = importlib.import_module('recbole_graph.data.dataset')
-    if hasattr(dataset_module, config['model'] + 'Dataset'):
-        dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
+    if hasattr(dataset_module, config['model'] + 'Dataset') or config['MODEL_TYPE'] == ModelType.SOCIAL:
+        if config['MODEL_TYPE'] == ModelType.SOCIAL:
+            dataset_class = getattr(dataset_module, 'SocialDataset')
+        else:
+            dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
 
         default_file = os.path.join(config['checkpoint_dir'], f'{config["dataset"]}-{dataset_class.__name__}.pth')
         file = config['dataset_save_path'] or default_file
@@ -132,6 +135,7 @@ def data_preparation(config, dataset):
     else:
         return recbole_data_preparation(config, dataset)
 
+
 def get_trainer(model_type, model_name):
     r"""Automatically select trainer class based on model type and model name
     Args:
@@ -144,3 +148,22 @@ def get_trainer(model_type, model_name):
         return getattr(importlib.import_module('recbole_graph.trainer'), model_name + 'Trainer')
     except AttributeError:
         return get_recbole_trainer(model_type, model_name)
+
+
+class ModelType(Enum):
+    """Type of models.
+
+    - ``GENERAL``: General Recommendation
+    - ``SEQUENTIAL``: Sequential Recommendation
+    - ``CONTEXT``: Context-aware Recommendation
+    - ``KNOWLEDGE``: Knowledge-based Recommendation
+    - ``Social``: Social-based Recommendation
+    """
+
+    GENERAL = 1
+    SEQUENTIAL = 2
+    CONTEXT = 3
+    KNOWLEDGE = 4
+    TRADITIONAL = 5
+    DECISIONTREE = 6
+    SOCIAL = 7

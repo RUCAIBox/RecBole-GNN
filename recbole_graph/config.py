@@ -1,8 +1,7 @@
 import os
 
 from recbole.config.configurator import Config as RecBole_Config
-from recbole.utils import ModelType
-from recbole_graph.utils import get_model
+from recbole_graph.utils import get_model, ModelType
 
 
 class Config(RecBole_Config):
@@ -64,6 +63,7 @@ class Config(RecBole_Config):
         special_sequential_on_ml_100k_init = os.path.join(quick_start_config_path, 'special_sequential_on_ml-100k.yaml')
         sequential_embedding_model_init = os.path.join(quick_start_config_path, 'sequential_embedding_model.yaml')
         knowledge_base_init = os.path.join(quick_start_config_path, 'knowledge_base.yaml')
+        social_base_init = os.path.join(quick_start_config_path, 'social_base.yaml')
 
         self.internal_config_dict = dict()
         for file in [overall_init_file, model_init_file, sample_init_file, dataset_init_file]:
@@ -92,6 +92,7 @@ class Config(RecBole_Config):
                 self._update_internal_config_dict(sequential_init)
                 if dataset == 'ml-100k' and model in ['GRU4RecF', 'SASRecF', 'FDSA', 'S3Rec']:
                     self._update_internal_config_dict(special_sequential_on_ml_100k_init)
-
         elif self.internal_config_dict['MODEL_TYPE'] == ModelType.KNOWLEDGE:
             self._update_internal_config_dict(knowledge_base_init)
+        elif self.internal_config_dict['MODEL_TYPE'] == ModelType.SOCIAL:
+            self._update_internal_config_dict(social_base_init)

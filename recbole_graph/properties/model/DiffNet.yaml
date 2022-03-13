@@ -1,0 +1,4 @@
+embedding_size: 64
+n_layers: 2
+pretrained_review: False
+loss_type: 'L2'

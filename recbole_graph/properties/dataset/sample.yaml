@@ -52,5 +52,9 @@ TAIL_ENTITY_ID_FIELD: tail_id
 RELATION_ID_FIELD: relation_id
 ENTITY_ID_FIELD: entity_id
 
+# Social-based Model Needed
+NET_USER_ID_FIELD1: user_id1
+NET_USER_ID_FIELD2: user_id2
+
 # Benchmark .inter
 benchmark_filename: ~
