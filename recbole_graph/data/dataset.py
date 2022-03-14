@@ -23,7 +23,7 @@ class Dataset(RecBoleDataset):
         """
 
         row = self.inter_feat[self.uid_field]
-        col = self.inter_feat[self.iid_filed] + self.user_num
+        col = self.inter_feat[self.iid_field] + self.user_num
         edge_index1 = torch.stack([row, col])
         edge_index2 = torch.stack([col, row])
         edge_index = torch.cat([edge_index1, edge_index2], dim=1)

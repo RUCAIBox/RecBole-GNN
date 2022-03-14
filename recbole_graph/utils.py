@@ -23,34 +23,49 @@ def create_dataset(config):
     Returns:
         Dataset: Constructed dataset.
     """
+    model_type = config['MODEL_TYPE']
     dataset_module = importlib.import_module('recbole_graph.data.dataset')
-    if hasattr(dataset_module, config['model'] + 'Dataset') or config['MODEL_TYPE'] == ModelType.SOCIAL:
-        if config['MODEL_TYPE'] == ModelType.SOCIAL:
+    if hasattr(dataset_module, config['model'] + 'Dataset') or model_type in [ModelType.GENERAL, ModelType.SOCIAL]:
+        if model_type == ModelType.GENERAL:
+            dataset_class = getattr(dataset_module, 'Dataset')
+        elif model_type == ModelType.SOCIAL:
             dataset_class = getattr(dataset_module, 'SocialDataset')
         else:
             dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
-
-        default_file = os.path.join(config['checkpoint_dir'], f'{config["dataset"]}-{dataset_class.__name__}.pth')
-        file = config['dataset_save_path'] or default_file
-        if os.path.exists(file):
-            with open(file, 'rb') as f:
-                dataset = pickle.load(f)
-            dataset_args_unchanged = True
-            for arg in dataset_arguments + ['seed', 'repeatable']:
-                if config[arg] != dataset.config[arg]:
-                    dataset_args_unchanged = False
-                    break
-            if dataset_args_unchanged:
-                logger = getLogger()
-                logger.info(set_color('Load filtered dataset from', 'pink') + f': [{file}]')
-                return dataset
-
-        dataset = dataset_class(config)
-        if config['save_dataset']:
-            dataset.save()
-        return dataset
     else:
-        return create_recbole_dataset(config)
+        dataset_module = importlib.import_module('recbole.data.dataset')
+        if hasattr(dataset_module, config['model'] + 'Dataset'):
+            dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
+        else:
+            type2class = {
+                ModelType.GENERAL: 'Dataset',
+                ModelType.SEQUENTIAL: 'SequentialDataset',
+                ModelType.CONTEXT: 'Dataset',
+                ModelType.KNOWLEDGE: 'KnowledgeBasedDataset',
+                ModelType.TRADITIONAL: 'Dataset',
+                ModelType.DECISIONTREE: 'Dataset',
+            }
+            dataset_class = getattr(dataset_module, type2class[model_type])
+
+    default_file = os.path.join(config['checkpoint_dir'], f'{config["dataset"]}-{dataset_class.__name__}.pth')
+    file = config['dataset_save_path'] or default_file
+    if os.path.exists(file):
+        with open(file, 'rb') as f:
+            dataset = pickle.load(f)
+        dataset_args_unchanged = True
+        for arg in dataset_arguments + ['seed', 'repeatable']:
+            if config[arg] != dataset.config[arg]:
+                dataset_args_unchanged = False
+                break
+        if dataset_args_unchanged:
+            logger = getLogger()
+            logger.info(set_color('Load filtered dataset from', 'pink') + f': [{file}]')
+            return dataset
+
+    dataset = dataset_class(config)
+    if config['save_dataset']:
+        dataset.save()
+    return dataset
 
 
 def get_model(model_name):
