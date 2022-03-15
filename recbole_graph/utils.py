@@ -25,27 +25,24 @@ def create_dataset(config):
     """
     model_type = config['MODEL_TYPE']
     dataset_module = importlib.import_module('recbole_graph.data.dataset')
-    if hasattr(dataset_module, config['model'] + 'Dataset') or model_type in [ModelType.GENERAL, ModelType.SOCIAL]:
-        if model_type == ModelType.GENERAL:
-            dataset_class = getattr(dataset_module, 'Dataset')
-        elif model_type == ModelType.SOCIAL:
-            dataset_class = getattr(dataset_module, 'SocialDataset')
-        else:
-            dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
+    if hasattr(dataset_module, config['model'] + 'Dataset'):
+        dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
+    elif model_type == ModelType.SOCIAL:
+        dataset_class = getattr(dataset_module, 'SocialDataset')
     else:
         dataset_module = importlib.import_module('recbole.data.dataset')
         if hasattr(dataset_module, config['model'] + 'Dataset'):
             dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
         else:
             type2class = {
-                ModelType.GENERAL: 'Dataset',
-                ModelType.SEQUENTIAL: 'SequentialDataset',
-                ModelType.CONTEXT: 'Dataset',
-                ModelType.KNOWLEDGE: 'KnowledgeBasedDataset',
-                ModelType.TRADITIONAL: 'Dataset',
-                ModelType.DECISIONTREE: 'Dataset',
+                ModelType.GENERAL.value: 'Dataset',
+                ModelType.SEQUENTIAL.value: 'SequentialDataset',
+                ModelType.CONTEXT.value: 'Dataset',
+                ModelType.KNOWLEDGE.value: 'KnowledgeBasedDataset',
+                ModelType.TRADITIONAL.value: 'Dataset',
+                ModelType.DECISIONTREE.value: 'Dataset',
             }
-            dataset_class = getattr(dataset_module, type2class[model_type])
+            dataset_class = getattr(dataset_module, type2class[model_type.value])
 
     default_file = os.path.join(config['checkpoint_dir'], f'{config["dataset"]}-{dataset_class.__name__}.pth')
     file = config['dataset_save_path'] or default_file

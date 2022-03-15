@@ -53,8 +53,9 @@ RELATION_ID_FIELD: relation_id
 ENTITY_ID_FIELD: entity_id
 
 # Social-based Model Needed
-NET_USER_ID_FIELD1: user_id1
-NET_USER_ID_FIELD2: user_id2
+NET_SOURCE_ID_FIELD: source_id
+NET_TARGET_ID_FIELD: target_id
+filter_net_by_inter: True
 
 # Benchmark .inter
 benchmark_filename: ~

@@ -2,7 +2,6 @@ import numpy as np
 import scipy.sparse as sp
 import torch
 
-from torch_geometric.utils import degree
 from recbole.model.init import xavier_uniform_initialization
 from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
