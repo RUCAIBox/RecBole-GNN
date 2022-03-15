@@ -5,7 +5,7 @@ from recbole_graph.utils import ModelType
 
 
 class GeneralGraphRecommender(GeneralRecommender):
-    """This is a abstract general graph recommender. All the general graph model should implement this class.
+    """This is an abstract general graph recommender. All the general graph models should implement in this class.
     The base general graph recommender class provide the basic U-I graph dataset and parameters information.
     """
     type = ModelType.GENERAL
