@@ -1,3 +1,17 @@
+# @Time   : 2022/3/15
+# @Author : Lanling Xu
+# @Email  : xulanling_sherry@163.com
+
+r"""
+DiffNet
+################################################
+Reference:
+    Le Wu et al. "A Neural Influence Diffusion Model for Social Recommendation." in SIGIR 2019.
+
+Reference code:
+    https://github.com/PeiJieSun/diffnet
+"""
+
 import numpy as np
 import scipy.sparse as sp
 import torch
