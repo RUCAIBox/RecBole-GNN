@@ -1,6 +1,11 @@
-from tqdm import tqdm
+import os
 import torch
+from tqdm import tqdm
+from torch_geometric.utils import degree
+
 from recbole.data.dataset import SequentialDataset
+from recbole.data.dataset import Dataset
+from recbole.utils import set_color, FeatureSource
 
 
 class SessionGraphDataset(SequentialDataset):
@@ -87,3 +92,121 @@ class LESSRDataset(SessionGraphDataset):
             'is_last': is_last
         }
         self.node_attr = ['x', 'is_last']
+
+
+class SocialDataset(Dataset):
+    """:class:`SocialDataset` is based on :class:`~recbole.data.dataset.dataset.Dataset`,
+    and load ``.net``.
+
+    All users in ``.inter`` and ``.net`` are remapped into the same ID sections.
+    Users that only exist in social network will be filtered.
+
+    It also provides several interfaces to transfer ``.net`` features into coo sparse matrix,
+    csr sparse matrix, :class:`DGL.Graph` or :class:`PyG.Data`.
+
+    Attributes:
+        net_src_field (str): The same as ``config['NET_SOURCE_ID_FIELD']``.
+
+        net_tgt_field (str): The same as ``config['NET_TARGET_ID_FIELD']``.
+
+        net_feat (pandas.DataFrame): Internal data structure stores the users' social network relations.
+            It's loaded from file ``.net``.
+    """
+    def __init__(self, config):
+        super().__init__(config)
+    
+    def _get_field_from_config(self):
+        super()._get_field_from_config()
+
+        self.net_src_field = self.config['NET_SOURCE_ID_FIELD']
+        self.net_tgt_field = self.config['NET_TARGET_ID_FIELD']
+        self.filter_net_by_inter = self.config['filter_net_by_inter']
+        self._check_field('net_src_field', 'net_tgt_field')
+
+        self.logger.debug(set_color('net_src_field', 'blue') + f': {self.net_src_field}')
+        self.logger.debug(set_color('net_tgt_field', 'blue') + f': {self.net_tgt_field}')
+
+    def _data_filtering(self):
+        super()._data_filtering()
+        if self.filter_net_by_inter:
+            self._filter_net_by_inter()
+
+    def _filter_net_by_inter(self):
+        """Filter users in ``net_feat`` that don't occur in interactions.
+        """
+        inter_uids = set(self.inter_feat[self.uid_field])
+        self.net_feat.drop(self.net_feat.index[~self.net_feat[self.net_src_field].isin(inter_uids)], inplace=True)
+        self.net_feat.drop(self.net_feat.index[~self.net_feat[self.net_tgt_field].isin(inter_uids)], inplace=True)
+
+    def _load_data(self, token, dataset_path):
+        super()._load_data(token, dataset_path)
+        self.net_feat = self._load_net(self.dataset_name, self.dataset_path)
+
+    @property
+    def net_num(self):
+        """Get the number of social network records.
+
+        Returns:
+            int: Number of social network records.
+        """
+        return len(self.net_feat)
+
+    def __str__(self):
+        info = [
+            super().__str__(),
+            set_color('The number of social network relations', 'blue') + f': {self.net_num}'
+        ]  # yapf: disable
+        return '\n'.join(info)
+
+    def _build_feat_name_list(self):
+        feat_name_list = super()._build_feat_name_list()
+        if self.net_feat is not None:
+            feat_name_list.append('net_feat')
+        return feat_name_list
+
+    def _load_net(self, token, dataset_path):
+        self.logger.debug(set_color(f'Loading social network from [{dataset_path}].', 'green'))
+        net_path = os.path.join(dataset_path, f'{token}.net')
+        if not os.path.isfile(net_path):
+            raise ValueError(f'[{token}.net] not found in [{dataset_path}].')
+        df = self._load_feat(net_path, FeatureSource.NET)
+        self._check_net(df)
+        return df
+
+    def _check_net(self, net):
+        net_warn_message = 'net data requires field [{}]'
+        assert self.net_src_field in net, net_warn_message.format(self.net_src_field)
+        assert self.net_tgt_field in net, net_warn_message.format(self.net_tgt_field)
+
+    def _init_alias(self):
+        """Add :attr:`alias_of_user_id`.
+        """
+        self._set_alias('user_id', [self.net_src_field, self.net_tgt_field])
+        super()._init_alias()
+
+    def get_norm_net_adj_mat(self, row_norm=False):
+        r"""Get the normalized socail matrix of users and users.
+        Construct the square matrix from the social network data and 
+        normalize it using the laplace matrix.
+        .. math::
+            A_{hat} = D^{-0.5} \times A \times D^{-0.5}
+        Returns:
+            The normalized social network matrix in Tensor.
+        """
+
+        row = self.net_feat[self.net_src_field]
+        col = self.net_feat[self.net_tgt_field]
+        edge_index1 = torch.stack([row, col])
+        edge_index2 = torch.stack([col, row])
+        edge_index = torch.cat([edge_index1, edge_index2], dim=1)
+
+        deg = degree(edge_index[0], self.user_num)
+
+        if row_norm:
+            norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
+            edge_weight = norm_deg[edge_index[0]]
+        else:
+            norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
+            edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
+
+        return edge_index, edge_weight

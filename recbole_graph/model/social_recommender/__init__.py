@@ -1,0 +1,1 @@
+from recbole_graph.model.social_recommender.diffnet import DiffNet
