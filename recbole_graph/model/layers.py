@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from torch_geometric.nn import MessagePassing
@@ -54,22 +55,24 @@ class SRGNNConv(MessagePassing):
         super(SRGNNConv, self).__init__(aggr='mean')
 
         self.lin = torch.nn.Linear(dim, dim)
-        self.b = nn.Parameter(torch.Tensor(dim))
 
     def forward(self, x, edge_index):
         x = self.lin(x)
-        return self.propagate(edge_index, x=x) + self.b
+        return self.propagate(edge_index, x=x)
 
 
 class SRGNNCell(nn.Module):
     def __init__(self, dim):
         super(SRGNNCell, self).__init__()
 
+        self.dim = dim
         self.incomming_conv = SRGNNConv(dim)
         self.outcomming_conv = SRGNNConv(dim)
 
         self.lin_ih = nn.Linear(2 * dim, 3 * dim)
         self.lin_hh = nn.Linear(dim, 3 * dim)
+
+        self._reset_parameters()
 
     def forward(self, hidden, edge_index):
         input_in = self.incomming_conv(hidden, edge_index)
@@ -86,3 +89,8 @@ class SRGNNCell(nn.Module):
         new_gate = torch.tanh(i_n + reset_gate * h_n)
         hy = (1 - input_gate) * hidden + input_gate * new_gate
         return hy
+
+    def _reset_parameters(self):
+        stdv = 1.0 / np.sqrt(self.dim)
+        for weight in self.parameters():
+            weight.data.uniform_(-stdv, stdv)
