@@ -1,5 +1,7 @@
 import os
 import torch
+import numpy as np
+
 from tqdm import tqdm
 from torch_geometric.utils import degree
 
@@ -181,8 +183,28 @@ class SocialDataset(Dataset):
     def _init_alias(self):
         """Add :attr:`alias_of_user_id`.
         """
-        self._set_alias('user_id', [self.net_src_field, self.net_tgt_field])
-        super()._init_alias()
+        self._set_alias('user_id', [self.uid_field, self.net_src_field, self.net_tgt_field])
+        self._set_alias('item_id', [self.iid_field])
+
+        for alias_name_1, alias_1 in self.alias.items():
+            for alias_name_2, alias_2 in self.alias.items():
+                if alias_name_1 != alias_name_2:
+                    intersect = np.intersect1d(alias_1, alias_2, assume_unique=True)
+                    if len(intersect) > 0:
+                        raise ValueError(
+                            f'`alias_of_{alias_name_1}` and `alias_of_{alias_name_2}` '
+                            f'should not have the same field {list(intersect)}.'
+                        )
+
+        self._rest_fields = self.token_like_fields
+        for alias_name, alias in self.alias.items():
+            isin = np.isin(alias, self._rest_fields, assume_unique=True)
+            if isin.all() is False:
+                raise ValueError(
+                    f'`alias_of_{alias_name}` should not contain '
+                    f'non-token-like field {list(alias[~isin])}.'
+                )
+            self._rest_fields = np.setdiff1d(self._rest_fields, alias, assume_unique=True)
 
     def get_norm_net_adj_mat(self, row_norm=False):
         r"""Get the normalized socail matrix of users and users.
