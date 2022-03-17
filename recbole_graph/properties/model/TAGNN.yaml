@@ -1,0 +1,4 @@
+embedding_size: 64
+step: 1
+loss_type: 'CE'
+transform: sess_graph

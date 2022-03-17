@@ -15,17 +15,7 @@ class SessionGraphDataset(SequentialDataset):
         super().__init__(config)
 
     def session_graph_construction(self):
-        raise NotImplementedError('Graph construction method needs to be implemented.')
-
-    def build(self):
-        datasets = super().build()
-        for dataset in datasets:
-            dataset.session_graph_construction()
-        return datasets
-
-
-class SRGNNDataset(SessionGraphDataset):
-    def session_graph_construction(self):
+        # Default session graph dataset follows the graph construction operator like SR-GNN.
         self.logger.info('Constructing session graphs.')
         item_seq = self.inter_feat[self.item_id_list_field]
         item_seq_len = self.inter_feat[self.item_list_length_field]
@@ -49,13 +39,11 @@ class SRGNNDataset(SessionGraphDataset):
             'alias_inputs': alias_inputs
         }
 
-
-class GCSANDataset(SRGNNDataset):
-    pass
-
-
-class NISERDataset(SRGNNDataset):
-    pass
+    def build(self):
+        datasets = super().build()
+        for dataset in datasets:
+            dataset.session_graph_construction()
+        return datasets
 
 
 class LESSRDataset(SessionGraphDataset):
