@@ -48,7 +48,7 @@ We list currently supported models according to category:
 
 **Social Recommendation**:
 
-* **[DiffNet]()** from Wu *et al.*: [A Neural Influence Diffusion Model for Social Recommendation](https://arxiv.org/abs/1904.10322) (SIGIR 2019).
+* **[DiffNet](recbole_graph/model/social_recommender/diffnet.py)** from Wu *et al.*: [A Neural Influence Diffusion Model for Social Recommendation](https://arxiv.org/abs/1904.10322) (SIGIR 2019).
 
 ## The Team
 
