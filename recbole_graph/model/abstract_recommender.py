@@ -1,6 +1,7 @@
 import torch
 from torch_geometric.utils import degree
-from recbole.model.abstract_recommender import GeneralRecommender
+from recbole.model.abstract_recommender import GeneralRecommender, SequentialRecommender
+
 from recbole_graph.utils import ModelType
 
 
@@ -37,6 +38,12 @@ class GeneralGraphRecommender(GeneralRecommender):
         edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
 
         return edge_index.to(self.device), edge_weight.to(self.device) 
+
+
+class SequentialRecommender(SequentialRecommender):
+    """This is an abstract sequential recommender. All the GNN-based sequential model should implement this class.
+    """
+    type = ModelType.SEQUENTIAL
 
 
 class SocialRecommender(GeneralRecommender):

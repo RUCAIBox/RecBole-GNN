@@ -13,10 +13,10 @@ Reference:
 
 import torch
 from torch import nn
-from recbole.model.abstract_recommender import SequentialRecommender
 from recbole.model.layers import TransformerEncoder
 from recbole.model.loss import EmbLoss, BPRLoss
 
+from recbole_graph.model.abstract_recommender import SequentialRecommender
 from recbole_graph.model.layers import SRGNNCell
 
 
