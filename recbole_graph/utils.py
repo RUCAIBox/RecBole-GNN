@@ -27,6 +27,8 @@ def create_dataset(config):
     dataset_module = importlib.import_module('recbole_graph.data.dataset')
     if hasattr(dataset_module, config['model'] + 'Dataset'):
         dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
+    elif model_type == ModelType.SEQUENTIAL:
+        dataset_class = getattr(dataset_module, 'SessionGraphDataset')
     elif model_type == ModelType.SOCIAL:
         dataset_class = getattr(dataset_module, 'SocialDataset')
     else:
