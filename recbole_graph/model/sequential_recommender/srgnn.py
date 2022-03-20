@@ -16,9 +16,9 @@ Reference code:
 import numpy as np
 import torch
 from torch import nn
-from recbole.model.abstract_recommender import SequentialRecommender
 from recbole.model.loss import BPRLoss
 
+from recbole_graph.model.abstract_recommender import SequentialRecommender
 from recbole_graph.model.layers import SRGNNCell
 
 

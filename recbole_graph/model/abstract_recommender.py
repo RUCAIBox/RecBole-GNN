@@ -1,12 +1,12 @@
 import torch
 from torch_geometric.utils import degree
+from recbole.model.abstract_recommender import GeneralRecommender, SequentialRecommender
 
-from recbole.model.abstract_recommender import GeneralRecommender
-from recbole.utils import ModelType
+from recbole_graph.utils import ModelType
 
 
 class GeneralGraphRecommender(GeneralRecommender):
-    """This is a abstract general graph recommender. All the general graph model should implement this class.
+    """This is an abstract general graph recommender. All the general graph models should implement in this class.
     The base general graph recommender class provide the basic U-I graph dataset and parameters information.
     """
     type = ModelType.GENERAL
@@ -37,4 +37,20 @@ class GeneralGraphRecommender(GeneralRecommender):
 
         edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
 
-        return edge_index.to(self.device), edge_weight.to(self.device)
+        return edge_index.to(self.device), edge_weight.to(self.device) 
+
+
+class SequentialRecommender(SequentialRecommender):
+    """This is an abstract sequential recommender. All the GNN-based sequential model should implement this class.
+    """
+    type = ModelType.SEQUENTIAL
+
+
+class SocialRecommender(GeneralRecommender):
+    """This is an abstract social recommender. All the social graph model should implement this class.
+    The base social recommender class provide the basic social graph dataset and parameters information.
+    """
+    type = ModelType.SOCIAL
+
+    def __init__(self, config, dataset):
+        super(SocialRecommender, self).__init__(config, dataset)
