@@ -1,6 +1,7 @@
 import os
-
 from recbole.config.configurator import Config as RecBole_Config
+from recbole.utils import ModelType as RecBoleModelType
+
 from recbole_graph.utils import get_model, ModelType
 
 
@@ -75,13 +76,13 @@ class Config(RecBole_Config):
                     ]
 
         self.internal_config_dict['MODEL_TYPE'] = model_class.type
-        if self.internal_config_dict['MODEL_TYPE'] == ModelType.GENERAL:
+        if self.internal_config_dict['MODEL_TYPE'] == RecBoleModelType.GENERAL:
             pass
-        elif self.internal_config_dict['MODEL_TYPE'] in {ModelType.CONTEXT, ModelType.DECISIONTREE}:
+        elif self.internal_config_dict['MODEL_TYPE'] in {RecBoleModelType.CONTEXT, RecBoleModelType.DECISIONTREE}:
             self._update_internal_config_dict(context_aware_init)
             if dataset == 'ml-100k':
                 self._update_internal_config_dict(context_aware_on_ml_100k_init)
-        elif self.internal_config_dict['MODEL_TYPE'] == ModelType.SEQUENTIAL:
+        elif self.internal_config_dict['MODEL_TYPE'] == RecBoleModelType.SEQUENTIAL:
             if model in ['DIN', 'DIEN']:
                 self._update_internal_config_dict(DIN_init)
                 if dataset == 'ml-100k':
@@ -92,7 +93,7 @@ class Config(RecBole_Config):
                 self._update_internal_config_dict(sequential_init)
                 if dataset == 'ml-100k' and model in ['GRU4RecF', 'SASRecF', 'FDSA', 'S3Rec']:
                     self._update_internal_config_dict(special_sequential_on_ml_100k_init)
-        elif self.internal_config_dict['MODEL_TYPE'] == ModelType.KNOWLEDGE:
+        elif self.internal_config_dict['MODEL_TYPE'] == RecBoleModelType.KNOWLEDGE:
             self._update_internal_config_dict(knowledge_base_init)
         elif self.internal_config_dict['MODEL_TYPE'] == ModelType.SOCIAL:
             self._update_internal_config_dict(social_base_init)

@@ -18,8 +18,7 @@ import torch
 from torch import nn
 from torch_geometric.utils import softmax
 from torch_geometric.nn import global_add_pool
-
-from recbole_graph.model.abstract_recommender import SequentialRecommender
+from recbole.model.abstract_recommender import SequentialRecommender
 
 
 class EOPA(nn.Module):

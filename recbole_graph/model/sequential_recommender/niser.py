@@ -15,8 +15,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from recbole.model.loss import BPRLoss
+from recbole.model.abstract_recommender import SequentialRecommender
 
-from recbole_graph.model.abstract_recommender import SequentialRecommender
 from recbole_graph.model.layers import SRGNNCell
 
 
