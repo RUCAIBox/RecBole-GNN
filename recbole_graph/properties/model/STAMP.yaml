@@ -1,2 +1,0 @@
-embedding_size: 64
-loss_type: 'CE'

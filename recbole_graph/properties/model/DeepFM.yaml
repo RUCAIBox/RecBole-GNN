@@ -1,3 +1,0 @@
-embedding_size: 10
-mlp_hidden_size: [128, 128, 128]
-dropout_prob: 0.2
