@@ -29,21 +29,17 @@ class BiGNNConv(MessagePassing):
     def __init__(self, in_channels, out_channels):
         super().__init__(aggr='add')
         self.in_channels, self.out_channels = in_channels, out_channels
-        self.lin1 = torch.nn.Linear(in_channels, out_channels)
-        self.lin2 = torch.nn.Linear(in_channels, out_channels)
+        self.lin1 = torch.nn.Linear(in_features=in_channels, out_features=out_channels)
+        self.lin2 = torch.nn.Linear(in_features=in_channels, out_features=out_channels)
 
     def forward(self, x, edge_index, edge_weight):
-        return self.propagate(edge_index, x=x, edge_weight=edge_weight)
+        x_prop = self.propagate(edge_index, x=x, edge_weight=edge_weight)
+        x_trans = self.lin1(x_prop + x)
+        x_inter = self.lin2(torch.mul(x_prop, x))
+        return x_trans + x_inter
 
-    def message(self, x_i, x_j, edge_weight):
-        x_trans = self.lin1(x_j)
-        x_inter = self.lin2(torch.mul(x_j, x_i))
-        x = x_trans + x_inter
-        x_prop = edge_weight.view(-1, 1) * x
-        return x_prop
-
-    def update(self, aggr_out, x):
-        return aggr_out + self.lin1(x)
+    def message(self, x_j, edge_weight):
+        return edge_weight.view(-1, 1) * x_j
 
     def __repr__(self):
         return '{}({},{})'.format(self.__class__.__name__, self.in_channels, self.out_channels)
