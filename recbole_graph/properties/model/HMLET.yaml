@@ -1,0 +1,14 @@
+embedding_size: 64
+n_layers: 4
+reg_weight: 1e-05
+require_pow: True
+gate_layer_ids: [2,3]
+gating_mlp_dims: [64,16,2]
+dropout_ratio: 0.2
+activation_function: elu
+
+warm_up_epochs: 50
+ori_temp: 0.7
+min_temp: 0.01
+gum_temp_decay: 0.005
+epoch_temp_decay: 1
