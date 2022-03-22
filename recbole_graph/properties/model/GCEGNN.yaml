@@ -1,0 +1,12 @@
+embedding_size: 64
+leakyrelu_alpha: 0.2
+dropout_local: 0.
+dropout_global: 0.5
+dropout_gcn: 0.
+loss_type: CE
+transform: sess_graph
+
+# global
+build_global_graph: True
+sample_num: 12
+hop: 1

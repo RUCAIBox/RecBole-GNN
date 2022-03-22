@@ -84,6 +84,74 @@ class LESSRDataset(SessionGraphDataset):
         self.node_attr = ['x', 'is_last']
 
 
+class GCEGNNDataset(SequentialDataset):
+    def __init__(self, config):
+        super().__init__(config)
+
+    def reverse_session(self):
+        self.logger.info('Reversing sessions.')
+        item_seq = self.inter_feat[self.item_id_list_field]
+        item_seq_len = self.inter_feat[self.item_list_length_field]
+        for i in tqdm(range(item_seq.shape[0])):
+            item_seq[i,:item_seq_len[i]] = item_seq[i,:item_seq_len[i]].flip(dims=[0])
+
+    def bidirectional_edge(self, edge_index):
+        seq_len = edge_index.shape[1]
+        ed = edge_index.T
+        ed2 = edge_index.T.flip(dims=[1])
+        idc = ed.unsqueeze(1).expand(-1, seq_len, 2) == ed2.unsqueeze(0).expand(seq_len, -1, 2)
+        return torch.logical_and(idc[:,:,0], idc[:,:,1]).any(dim=-1)
+
+    def session_graph_construction(self):
+        self.logger.info('Constructing session graphs.')
+        item_seq = self.inter_feat[self.item_id_list_field]
+        item_seq_len = self.inter_feat[self.item_list_length_field]
+        x = []
+        edge_index = []
+        edge_attr = []
+        alias_inputs = []
+
+        for i, seq in enumerate(tqdm(list(torch.chunk(item_seq, item_seq.shape[0])))):
+            seq, idx = torch.unique(seq, return_inverse=True)
+            x.append(seq)
+            alias_seq = idx.squeeze(0)[:item_seq_len[i]]
+            alias_inputs.append(alias_seq)
+
+            edge_index_backward = torch.stack([alias_seq[:-1], alias_seq[1:]])
+            edge_attr_backward = torch.where(self.bidirectional_edge(edge_index_backward), 3, 1)
+            edge_backward = torch.cat([edge_index_backward, edge_attr_backward.unsqueeze(0)], dim=0)
+
+            edge_index_forward = torch.stack([alias_seq[1:], alias_seq[:-1]])
+            edge_attr_forward = torch.where(self.bidirectional_edge(edge_index_forward), 3, 2)
+            edge_forward = torch.cat([edge_index_forward, edge_attr_forward.unsqueeze(0)], dim=0)
+
+            edge_index_selfloop = torch.stack([alias_seq, alias_seq])
+            edge_selfloop = torch.cat([edge_index_selfloop, torch.zeros([1, edge_index_selfloop.shape[1]])], dim=0)
+
+            edge = torch.cat([edge_backward, edge_forward, edge_selfloop], dim=-1).long()
+            edge = edge.unique(dim=-1)
+
+            cur_edge_index = edge[:2]
+            cur_edge_attr = edge[2]
+            edge_index.append(cur_edge_index)
+            edge_attr.append(cur_edge_attr)
+
+        self.inter_feat.interaction['graph_idx'] = torch.arange(item_seq.shape[0])
+        self.graph_objs = {
+            'x': x,
+            'edge_index': edge_index,
+            'edge_attr': edge_attr,
+            'alias_inputs': alias_inputs
+        }
+
+    def build(self):
+        datasets = super().build()
+        for dataset in datasets:
+            dataset.reverse_session()
+            dataset.session_graph_construction()
+        return datasets
+
+
 class SocialDataset(Dataset):
     """:class:`SocialDataset` is based on :class:`~recbole.data.dataset.dataset.Dataset`,
     and load ``.net``.
