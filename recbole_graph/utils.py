@@ -25,9 +25,12 @@ def create_dataset(config):
     """
     model_type = config['MODEL_TYPE']
     dataset_module = importlib.import_module('recbole_graph.data.dataset')
+    gen_graph_module_path = '.'.join(['recbole_graph.model.general_recommender', config['model'].lower()])
     seq_module_path = '.'.join(['recbole_graph.model.sequential_recommender', config['model'].lower()])
     if hasattr(dataset_module, config['model'] + 'Dataset'):
         dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
+    elif importlib.util.find_spec(gen_graph_module_path, __name__):
+        dataset_class = getattr(dataset_module, 'GeneralGraphDataset')
     elif importlib.util.find_spec(seq_module_path, __name__):
         dataset_class = getattr(dataset_module, 'SessionGraphDataset')
     elif model_type == ModelType.SOCIAL:
