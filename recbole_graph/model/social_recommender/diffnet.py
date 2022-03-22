@@ -13,7 +13,6 @@ Reference code:
 """
 
 import numpy as np
-import scipy.sparse as sp
 import torch
 
 from recbole.model.init import xavier_uniform_initialization
@@ -80,16 +79,6 @@ class DiffNet(SocialRecommender):
             self.user_fusion_layer = torch.nn.Linear(self.embedding_size, self.embedding_size)
             self.item_fusion_layer = torch.nn.Linear(self.embedding_size, self.embedding_size)
             self.activation = torch.nn.Sigmoid()
-
-    def get_ego_embeddings(self):
-        r"""Get the embedding of users and items and combine to an embedding matrix.
-        Returns:
-            Tensor of the embedding matrix. Shape of [n_items+n_users, embedding_dim]
-        """
-        user_embeddings = self.user_embedding.weight
-        item_embeddings = self.item_embedding.weight
-        ego_embeddings = torch.cat([user_embeddings, item_embeddings], dim=0)
-        return ego_embeddings
 
     def convertDistribution(self, x):
         mean, std = torch.mean(x), torch.std(x)

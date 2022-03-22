@@ -1,0 +1,9 @@
+# WARNING:
+# if you set inter_matrix_type='rating', you must set `unused_col: ~` in your data config files.
+
+embedding_size: 64
+hidden_size: 16
+mlp_layer_num: 3
+norm_momentum: 0.5
+rating_list: [1]
+inter_matrix_type: '01'
