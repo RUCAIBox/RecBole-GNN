@@ -25,26 +25,15 @@ def create_dataset(config):
     """
     model_type = config['MODEL_TYPE']
     dataset_module = importlib.import_module('recbole_graph.data.dataset')
+    seq_module_path = '.'.join(['recbole_graph.model.sequential_recommender', config['model'].lower()])
     if hasattr(dataset_module, config['model'] + 'Dataset'):
         dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
-    elif model_type == ModelType.SEQUENTIAL:
+    elif importlib.util.find_spec(seq_module_path, __name__):
         dataset_class = getattr(dataset_module, 'SessionGraphDataset')
     elif model_type == ModelType.SOCIAL:
         dataset_class = getattr(dataset_module, 'SocialDataset')
     else:
-        dataset_module = importlib.import_module('recbole.data.dataset')
-        if hasattr(dataset_module, config['model'] + 'Dataset'):
-            dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
-        else:
-            type2class = {
-                ModelType.GENERAL.value: 'Dataset',
-                ModelType.SEQUENTIAL.value: 'SequentialDataset',
-                ModelType.CONTEXT.value: 'Dataset',
-                ModelType.KNOWLEDGE.value: 'KnowledgeBasedDataset',
-                ModelType.TRADITIONAL.value: 'Dataset',
-                ModelType.DECISIONTREE.value: 'Dataset',
-            }
-            dataset_class = getattr(dataset_module, type2class[model_type.value])
+        return create_recbole_dataset(config)
 
     default_file = os.path.join(config['checkpoint_dir'], f'{config["dataset"]}-{dataset_class.__name__}.pth')
     file = config['dataset_save_path'] or default_file
@@ -167,17 +156,7 @@ def get_trainer(model_type, model_name):
 class ModelType(Enum):
     """Type of models.
 
-    - ``GENERAL``: General Recommendation
-    - ``SEQUENTIAL``: Sequential Recommendation
-    - ``CONTEXT``: Context-aware Recommendation
-    - ``KNOWLEDGE``: Knowledge-based Recommendation
     - ``Social``: Social-based Recommendation
     """
 
-    GENERAL = 1
-    SEQUENTIAL = 2
-    CONTEXT = 3
-    KNOWLEDGE = 4
-    TRADITIONAL = 5
-    DECISIONTREE = 6
     SOCIAL = 7

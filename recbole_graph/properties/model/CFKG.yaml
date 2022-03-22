@@ -1,3 +1,0 @@
-embedding_size: 64
-loss_function: 'inner_product'
-margin: 1.0
