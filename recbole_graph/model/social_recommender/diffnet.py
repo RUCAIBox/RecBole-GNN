@@ -13,7 +13,6 @@ Reference code:
 """
 
 import numpy as np
-import scipy.sparse as sp
 import torch
 
 from recbole.model.init import xavier_uniform_initialization
@@ -34,16 +33,18 @@ class DiffNet(SocialRecommender):
         super(DiffNet, self).__init__(config, dataset)
 
         # load dataset info
-        self.LABEL = config['LABEL_FIELD']
-        self.row_norm_adj_mat = self.get_row_norm_adj_mat(dataset)
+        self.edge_index, self.edge_weight = dataset.get_norm_adj_mat(row_norm=True)
+        self.edge_index, self.edge_weight = self.edge_index.to(self.device), self.edge_weight.to(self.device)
+
         self.net_edge_index, self.net_edge_weight = dataset.get_norm_net_adj_mat(row_norm=True)
         self.net_edge_index, self.net_edge_weight = self.net_edge_index.to(self.device), self.net_edge_weight.to(self.device)
 
         # load parameters info
+        self.LABEL = config['LABEL_FIELD']
         self.embedding_size = config['embedding_size']  # int type:the embedding size of DiffNet
         self.n_layers = config['n_layers']  # int type:the GCN layer num of DiffNet for social net
-        self.pretrained_review = config['pretrained_review'] # bool type:whether to load pre-trained review vectors of users and items
-        self.loss_type = config['loss_type']
+        self.pretrained_review = config['pretrained_review']  # bool type:whether to load pre-trained review vectors of users and items
+        self.loss_type = config['loss_type']  # string type:the loss type of optimization
 
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.embedding_size)
@@ -79,31 +80,6 @@ class DiffNet(SocialRecommender):
             self.item_fusion_layer = torch.nn.Linear(self.embedding_size, self.embedding_size)
             self.activation = torch.nn.Sigmoid()
 
-    def get_row_norm_adj_mat(self, dataset):
-        r"""Get the row-normalized interaction matrix of users and items.
-        """
-        interaction_matrix = dataset.inter_matrix(form='coo').astype(np.float32)
-        rowsum = interaction_matrix.sum(axis=1)
-        rowsum = np.where(rowsum == 0, np.ones([1]), rowsum)
-        L = interaction_matrix / rowsum
-        L = sp.coo_matrix(L)
-        row = L.row
-        col = L.col
-        i = torch.LongTensor(np.array([row, col]))
-        data = torch.FloatTensor(L.data)
-        SparseL = torch.sparse.FloatTensor(i, data, torch.Size(L.shape))
-        return SparseL.to(self.device)
-
-    def get_ego_embeddings(self):
-        r"""Get the embedding of users and items and combine to an embedding matrix.
-        Returns:
-            Tensor of the embedding matrix. Shape of [n_items+n_users, embedding_dim]
-        """
-        user_embeddings = self.user_embedding.weight
-        item_embeddings = self.item_embedding.weight
-        ego_embeddings = torch.cat([user_embeddings, item_embeddings], dim=0)
-        return ego_embeddings
-
     def convertDistribution(self, x):
         mean, std = torch.mean(x), torch.std(x)
         y = (x - mean) * 0.2 / std
@@ -123,7 +99,9 @@ class DiffNet(SocialRecommender):
             user_embedding = user_embedding + user_review_vector_matrix
             final_item_embedding = final_item_embedding + item_review_vector_matrix
 
-        user_embedding_from_consumed_items = torch.sparse.mm(self.row_norm_adj_mat, final_item_embedding)
+        ego_embeddings = torch.cat([user_embedding, final_item_embedding], dim=0)
+        all_embeddings = self.gcn_conv(ego_embeddings, self.edge_index, self.edge_weight)
+        user_embedding_from_consumed_items, _ = torch.split(all_embeddings, [self.n_users, self.n_items])
 
         embeddings_list = []
         for layer_idx in range(self.n_layers):
