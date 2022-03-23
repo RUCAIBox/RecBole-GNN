@@ -1,6 +1,7 @@
 import os
 import torch
 import numpy as np
+import pandas as pd
 
 from tqdm import tqdm
 from torch_geometric.utils import degree
@@ -211,6 +212,7 @@ class SocialDataset(GeneralGraphDataset):
         self.net_src_field = self.config['NET_SOURCE_ID_FIELD']
         self.net_tgt_field = self.config['NET_TARGET_ID_FIELD']
         self.filter_net_by_inter = self.config['filter_net_by_inter']
+        self.undirected_net = self.config['undirected_net']
         self._check_field('net_src_field', 'net_tgt_field')
 
         self.logger.debug(set_color('net_src_field', 'blue') + f': {self.net_src_field}')
@@ -260,6 +262,14 @@ class SocialDataset(GeneralGraphDataset):
         if not os.path.isfile(net_path):
             raise ValueError(f'[{token}.net] not found in [{dataset_path}].')
         df = self._load_feat(net_path, FeatureSource.NET)
+        if self.undirected_net:
+            row = df[self.net_src_field]
+            col = df[self.net_tgt_field]
+            df_net_src = pd.concat([row, col], axis=0)
+            df_net_tgt = pd.concat([col, row], axis=0)
+            df_net_src.name = self.net_src_field
+            df_net_tgt.name = self.net_tgt_field
+            df = pd.concat([df_net_src, df_net_tgt], axis=1)
         self._check_net(df)
         return df
 
@@ -306,9 +316,7 @@ class SocialDataset(GeneralGraphDataset):
 
         row = self.net_feat[self.net_src_field]
         col = self.net_feat[self.net_tgt_field]
-        edge_index1 = torch.stack([row, col])
-        edge_index2 = torch.stack([col, row])
-        edge_index = torch.cat([edge_index1, edge_index2], dim=1)
+        edge_index = torch.stack([row, col])
 
         deg = degree(edge_index[0], self.user_num)
 
