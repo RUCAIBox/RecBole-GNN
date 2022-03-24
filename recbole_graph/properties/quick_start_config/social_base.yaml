@@ -1,3 +1,9 @@
+NET_SOURCE_ID_FIELD: source_id
+NET_TARGET_ID_FIELD: target_id
+
 load_col: 
     inter: ['user_id', 'item_id', 'rating', 'timestamp']
     net: [source_id, target_id]
+
+filter_net_by_inter: True
+undirected_net: True

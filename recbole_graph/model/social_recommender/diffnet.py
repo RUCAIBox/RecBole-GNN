@@ -20,7 +20,7 @@ from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import SocialRecommender
-from recbole_graph.model.layers import LightGCNConv
+from recbole_graph.model.layers import BipartiteGCNConv
 
 
 class DiffNet(SocialRecommender):
@@ -33,7 +33,7 @@ class DiffNet(SocialRecommender):
         super(DiffNet, self).__init__(config, dataset)
 
         # load dataset info
-        self.edge_index, self.edge_weight = dataset.get_norm_adj_mat(row_norm=True)
+        self.edge_index, self.edge_weight = dataset.get_bipartite_inter_mat(row='user')
         self.edge_index, self.edge_weight = self.edge_index.to(self.device), self.edge_weight.to(self.device)
 
         self.net_edge_index, self.net_edge_weight = dataset.get_norm_net_adj_mat(row_norm=True)
@@ -49,7 +49,7 @@ class DiffNet(SocialRecommender):
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.embedding_size)
         self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.embedding_size)
-        self.gcn_conv = LightGCNConv(dim=self.embedding_size)
+        self.bipartite_gcn_conv = BipartiteGCNConv(dim=self.embedding_size)
 
         if self.loss_type == 'BCE':
             self.loss_fct = torch.nn.BCELoss()
@@ -99,13 +99,11 @@ class DiffNet(SocialRecommender):
             user_embedding = user_embedding + user_review_vector_matrix
             final_item_embedding = final_item_embedding + item_review_vector_matrix
 
-        ego_embeddings = torch.cat([user_embedding, final_item_embedding], dim=0)
-        all_embeddings = self.gcn_conv(ego_embeddings, self.edge_index, self.edge_weight)
-        user_embedding_from_consumed_items, _ = torch.split(all_embeddings, [self.n_users, self.n_items])
+        user_embedding_from_consumed_items = self.bipartite_gcn_conv(x=(final_item_embedding, user_embedding), edge_index=self.edge_index, edge_weight=self.edge_weight, size=(self.n_items, self.n_users))
 
         embeddings_list = []
         for layer_idx in range(self.n_layers):
-            user_embedding = self.gcn_conv(user_embedding, self.net_edge_index, self.net_edge_weight)
+            user_embedding = self.bipartite_gcn_conv((user_embedding, user_embedding), self.net_edge_index, self.net_edge_weight, size=(self.n_users, self.n_users))
             embeddings_list.append(user_embedding)
         final_user_embedding = torch.stack(embeddings_list, dim=1)
         final_user_embedding = torch.sum(final_user_embedding, dim=1) + user_embedding_from_consumed_items

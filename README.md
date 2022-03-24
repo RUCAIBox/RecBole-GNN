@@ -53,6 +53,7 @@ We list currently supported models according to category:
 
 * **[DiffNet](recbole_graph/model/social_recommender/diffnet.py)** from Wu *et al.*: [A Neural Influence Diffusion Model for Social Recommendation](https://arxiv.org/abs/1904.10322) (SIGIR 2019).
 * **[GraphRec](recbole_graph/model/social_recommender/graphrec.py)** from Fan *et al.*: [Graph Neural Networks for Social Recommendation](https://doi.org/10.1145/3308558.3313488) (WWW 2019).
+* **[SEPT](recbole_graph/model/social_recommender/sept.py)** from Yu *et al.*: [Socially-Aware Self-Supervised Tri-Training for Recommendation](https://doi.org/10.1145/3447548.3467340) (KDD 2021).
 
 ## The Team
 

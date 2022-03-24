@@ -1,13 +1,61 @@
 import os
 import torch
 import numpy as np
+import pandas as pd
 
 from tqdm import tqdm
 from torch_geometric.utils import degree
 
 from recbole.data.dataset import SequentialDataset
-from recbole.data.dataset import Dataset
+from recbole.data.dataset import Dataset as RecBoleDataset
 from recbole.utils import set_color, FeatureSource
+
+
+class GeneralGraphDataset(RecBoleDataset):
+    def __init__(self, config):
+        super().__init__(config)
+
+    def get_norm_adj_mat(self):
+        r"""Get the normalized interaction matrix of users and items.
+        Construct the square matrix from the training data and normalize it
+        using the laplace matrix.
+        .. math::
+            A_{hat} = D^{-0.5} \times A \times D^{-0.5}
+        Returns:
+            The normalized interaction matrix in Tensor.
+        """
+
+        row = self.inter_feat[self.uid_field]
+        col = self.inter_feat[self.iid_field] + self.user_num
+        edge_index1 = torch.stack([row, col])
+        edge_index2 = torch.stack([col, row])
+        edge_index = torch.cat([edge_index1, edge_index2], dim=1)
+
+        deg = degree(edge_index[0], self.user_num + self.item_num)
+
+        norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
+        edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
+
+        return edge_index, edge_weight
+
+    def get_bipartite_inter_mat(self, row='user'):
+        r"""Get the row-normalized bipartite interaction matrix of users and items.
+        """
+        if row == 'user':
+            row_field, col_field = self.uid_field, self.iid_field
+        else:
+            row_field, col_field = self.iid_field, self.uid_field
+
+        row = self.inter_feat[row_field]
+        col = self.inter_feat[col_field]
+        edge_index = torch.stack([row, col])
+
+        deg = degree(edge_index[0], self.num(row_field))
+
+        norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
+        edge_weight = norm_deg[edge_index[0]]
+
+        return edge_index, edge_weight
 
 
 class SessionGraphDataset(SequentialDataset):
@@ -152,8 +200,8 @@ class GCEGNNDataset(SequentialDataset):
         return datasets
 
 
-class SocialDataset(Dataset):
-    """:class:`SocialDataset` is based on :class:`~recbole.data.dataset.dataset.Dataset`,
+class SocialDataset(GeneralGraphDataset):
+    """:class:`SocialDataset` is based on :class:`~recbole_graph.data.dataset.GeneralGraphDataset`,
     and load ``.net``.
 
     All users in ``.inter`` and ``.net`` are remapped into the same ID sections.
@@ -179,6 +227,7 @@ class SocialDataset(Dataset):
         self.net_src_field = self.config['NET_SOURCE_ID_FIELD']
         self.net_tgt_field = self.config['NET_TARGET_ID_FIELD']
         self.filter_net_by_inter = self.config['filter_net_by_inter']
+        self.undirected_net = self.config['undirected_net']
         self._check_field('net_src_field', 'net_tgt_field')
 
         self.logger.debug(set_color('net_src_field', 'blue') + f': {self.net_src_field}')
@@ -228,6 +277,14 @@ class SocialDataset(Dataset):
         if not os.path.isfile(net_path):
             raise ValueError(f'[{token}.net] not found in [{dataset_path}].')
         df = self._load_feat(net_path, FeatureSource.NET)
+        if self.undirected_net:
+            row = df[self.net_src_field]
+            col = df[self.net_tgt_field]
+            df_net_src = pd.concat([row, col], axis=0)
+            df_net_tgt = pd.concat([col, row], axis=0)
+            df_net_src.name = self.net_src_field
+            df_net_tgt.name = self.net_tgt_field
+            df = pd.concat([df_net_src, df_net_tgt], axis=1)
         self._check_net(df)
         return df
 
@@ -262,33 +319,6 @@ class SocialDataset(Dataset):
                 )
             self._rest_fields = np.setdiff1d(self._rest_fields, alias, assume_unique=True)
 
-    def get_norm_adj_mat(self, row_norm=False):
-        r"""Get the normalized interaction matrix of users and items.
-        Construct the square matrix from the training data and normalize it
-        using the laplace matrix.
-        .. math::
-            A_{hat} = D^{-0.5} \times A \times D^{-0.5}
-        Returns:
-            The normalized interaction matrix in Tensor.
-        """
-
-        row = self.inter_feat[self.uid_field]
-        col = self.inter_feat[self.iid_field] + self.user_num
-        edge_index1 = torch.stack([row, col])
-        edge_index2 = torch.stack([col, row])
-        edge_index = torch.cat([edge_index1, edge_index2], dim=1)
-
-        deg = degree(edge_index[0], self.user_num + self.item_num)
-
-        if row_norm:
-            norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
-            edge_weight = norm_deg[edge_index[0]]
-        else:
-            norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
-            edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
-
-        return edge_index, edge_weight
-
     def get_norm_net_adj_mat(self, row_norm=False):
         r"""Get the normalized socail matrix of users and users.
         Construct the square matrix from the social network data and 
@@ -301,9 +331,7 @@ class SocialDataset(Dataset):
 
         row = self.net_feat[self.net_src_field]
         col = self.net_feat[self.net_tgt_field]
-        edge_index1 = torch.stack([row, col])
-        edge_index2 = torch.stack([col, row])
-        edge_index = torch.cat([edge_index1, edge_index2], dim=1)
+        edge_index = torch.stack([row, col])
 
         deg = degree(edge_index[0], self.user_num)
 
@@ -315,3 +343,13 @@ class SocialDataset(Dataset):
             edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
 
         return edge_index, edge_weight
+
+    def net_matrix(self, form='coo', value_field=None):
+        """Get sparse matrix that describe social relations between user_id and user_id.
+
+        Sparse matrix has shape (user_num, user_num).
+
+        Returns:
+            scipy.sparse: Sparse matrix in form ``coo`` or ``csr``.
+        """
+        return self._create_sparse_matrix(self.net_feat, self.net_src_field, self.net_tgt_field, form, value_field)
