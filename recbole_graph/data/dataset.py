@@ -50,7 +50,7 @@ class GeneralGraphDataset(RecBoleDataset):
         col = self.inter_feat[col_field]
         edge_index = torch.stack([row, col])
 
-        deg = degree(edge_index[0], self.user_num + self.item_num)
+        deg = degree(edge_index[0], self.num(row_field))
 
         norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
         edge_weight = norm_deg[edge_index[0]]
