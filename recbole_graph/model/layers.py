@@ -20,6 +20,21 @@ class LightGCNConv(MessagePassing):
         return '{}({})'.format(self.__class__.__name__, self.dim)
 
 
+class BipartiteGCNConv(MessagePassing):
+    def __init__(self, dim):
+        super(BipartiteGCNConv, self).__init__(aggr='add', flow='target_to_source')
+        self.dim = dim
+
+    def forward(self, x, edge_index, edge_weight, size):
+        return self.propagate(edge_index, x=x, edge_weight=edge_weight, size=size)
+
+    def message(self, x_j, edge_weight):
+        return edge_weight.view(-1, 1) * x_j
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, self.dim)
+
+
 class BiGNNConv(MessagePassing):
     r"""Propagate a layer of Bi-interaction GNN
 

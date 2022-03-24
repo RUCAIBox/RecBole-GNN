@@ -15,7 +15,7 @@ class GeneralGraphDataset(RecBoleDataset):
     def __init__(self, config):
         super().__init__(config)
 
-    def get_norm_adj_mat(self, row_norm=False):
+    def get_norm_adj_mat(self):
         r"""Get the normalized interaction matrix of users and items.
         Construct the square matrix from the training data and normalize it
         using the laplace matrix.
@@ -33,12 +33,27 @@ class GeneralGraphDataset(RecBoleDataset):
 
         deg = degree(edge_index[0], self.user_num + self.item_num)
 
-        if row_norm:
-            norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
-            edge_weight = norm_deg[edge_index[0]]
+        norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
+        edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
+
+        return edge_index, edge_weight
+
+    def get_bipartite_inter_mat(self, row='user'):
+        r"""Get the row-normalized bipartite interaction matrix of users and items.
+        """
+        if row == 'user':
+            row_field, col_field = self.uid_field, self.iid_field
         else:
-            norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
-            edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
+            row_field, col_field = self.iid_field, self.uid_field
+
+        row = self.inter_feat[row_field]
+        col = self.inter_feat[col_field]
+        edge_index = torch.stack([row, col])
+
+        deg = degree(edge_index[0], self.user_num + self.item_num)
+
+        norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
+        edge_weight = norm_deg[edge_index[0]]
 
         return edge_index, edge_weight
 
@@ -328,3 +343,13 @@ class SocialDataset(GeneralGraphDataset):
             edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
 
         return edge_index, edge_weight
+
+    def net_matrix(self, form='coo', value_field=None):
+        """Get sparse matrix that describe social relations between user_id and user_id.
+
+        Sparse matrix has shape (user_num, user_num).
+
+        Returns:
+            scipy.sparse: Sparse matrix in form ``coo`` or ``csr``.
+        """
+        return self._create_sparse_matrix(self.net_feat, self.net_src_field, self.net_tgt_field, form, value_field)

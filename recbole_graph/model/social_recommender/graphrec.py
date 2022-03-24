@@ -24,7 +24,6 @@ from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import SocialRecommender
-from recbole_graph.model.layers import LightGCNConv
 
 
 class Attention(nn.Module):
@@ -50,15 +49,15 @@ class UIAggregator(MessagePassing):
     r"""UIAggregator is to capture interactions and opinions in the user-item graph.
     """
     def __init__(self, opinion_emb, emb_dim):
-        super().__init__(aggr='add')
+        super().__init__(aggr='add', flow='target_to_source')
         self.opinion_emb = opinion_emb
         self.ln1 = nn.Linear(emb_dim * 2, emb_dim)
         self.ln2 = nn.Linear(emb_dim, emb_dim)
         self.activation = nn.ReLU()
         self.att = Attention(emb_dim)
 
-    def forward(self, x, edge_index, edge_attr):
-        return self.propagate(edge_index, x=x, edge_attr=edge_attr)
+    def forward(self, x, edge_index, edge_attr, size):
+        return self.propagate(edge_index, x=x, edge_attr=edge_attr, size=size)
 
     def message(self, x_j, x_i, edge_attr, index, ptr, size_i):
         r = self.opinion_emb(edge_attr)
@@ -103,8 +102,11 @@ class GraphRec(SocialRecommender):
         super(GraphRec, self).__init__(config, dataset)
 
         # load dataset info
-        self.edge_index, _ = dataset.get_norm_adj_mat(row_norm=True)
-        self.edge_index = self.edge_index.to(self.device)
+        self.user_edge_index, _ = dataset.get_bipartite_inter_mat(row='user')
+        self.user_edge_index = self.user_edge_index.to(self.device)
+
+        self.item_edge_index, _ = dataset.get_bipartite_inter_mat(row='item')
+        self.item_edge_index = self.item_edge_index.to(self.device)
 
         self.net_edge_index, _ = dataset.get_norm_net_adj_mat(row_norm=True)
         self.net_edge_index = self.net_edge_index.to(self.device)
@@ -160,7 +162,7 @@ class GraphRec(SocialRecommender):
         r"""Get the normalized indexes of ratings in opinion embeddings.
         """
         if self.inter_matrix_type == '01':
-            edge_attr = torch.zeros(self.edge_index.size(1))
+            edge_attr = torch.zeros(self.user_edge_index.size(1))
         elif self.inter_matrix_type == 'rating':
             ratings = dataset.inter_feat[self.RATING]
             opinion_dict = {value: key for key, value in enumerate(self.rating_list)}
@@ -176,8 +178,7 @@ class GraphRec(SocialRecommender):
         all_embeddings = torch.cat([user_embeddings, item_embeddings], dim=0)
 
         # Item Aggregation in User Modeling
-        user_all_ui_embeddings = self.u_aggregator(all_embeddings, self.edge_index, self.edge_attr)
-        user_ui_embeddings, _ = torch.split(user_all_ui_embeddings, [self.n_users, self.n_items])
+        user_ui_embeddings = self.u_aggregator((item_embeddings, user_embeddings), self.user_edge_index, self.edge_attr, (self.n_items, self.n_users))
         user_ui_embeddings = self.activation(self.u_agg_linear(torch.cat([user_embeddings, user_ui_embeddings], dim=1)))
 
         # Social Aggregation in User Modeling
@@ -187,8 +188,7 @@ class GraphRec(SocialRecommender):
         user_all_embeddings = self.activation(self.social_agg_linear(torch.cat([user_ui_embeddings, user_social_embeddings], dim=1)))
 
         # User Aggregation in Item Modeling
-        item_all_ui_embeddings = self.i_aggregator(all_embeddings, self.edge_index, self.edge_attr)
-        _, item_all_embeddings = torch.split(item_all_ui_embeddings, [self.n_users, self.n_items])
+        item_all_embeddings = self.i_aggregator((user_embeddings, item_embeddings), self.item_edge_index, self.edge_attr, (self.n_users, self.n_items))
         item_all_embeddings = self.activation(self.i_agg_linear(torch.cat([item_embeddings, item_all_embeddings], dim=1)))
 
         return user_all_embeddings, item_all_embeddings
