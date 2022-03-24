@@ -20,7 +20,7 @@ from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import SocialRecommender
-from recbole_graph.model.layers import LightGCNConv, BipartiteGCNConv
+from recbole_graph.model.layers import BipartiteGCNConv
 
 
 class DiffNet(SocialRecommender):
@@ -49,7 +49,6 @@ class DiffNet(SocialRecommender):
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.embedding_size)
         self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.embedding_size)
-        self.gcn_conv = LightGCNConv(dim=self.embedding_size)
         self.bipartite_gcn_conv = BipartiteGCNConv(dim=self.embedding_size)
 
         if self.loss_type == 'BCE':
@@ -104,7 +103,7 @@ class DiffNet(SocialRecommender):
 
         embeddings_list = []
         for layer_idx in range(self.n_layers):
-            user_embedding = self.gcn_conv(user_embedding, self.net_edge_index, self.net_edge_weight)
+            user_embedding = self.bipartite_gcn_conv((user_embedding, user_embedding), self.net_edge_index, self.net_edge_weight, size=(self.n_users, self.n_users))
             embeddings_list.append(user_embedding)
         final_user_embedding = torch.stack(embeddings_list, dim=1)
         final_user_embedding = torch.sum(final_user_embedding, dim=1) + user_embedding_from_consumed_items

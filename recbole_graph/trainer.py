@@ -164,3 +164,16 @@ class HMLETTrainer(Trainer):
             for gating in self.model.gating_nets:
                 self.model._gating_freeze(gating, True)
         return super()._train_epoch(train_data, epoch_idx, loss_func, show_progress)
+
+
+class SEPTTrainer(Trainer):
+    def __init__(self, config, model):
+        super(SEPTTrainer, self).__init__(config, model)
+        self.warm_up_epochs = config['warm_up_epochs']
+
+    def _train_epoch(self, train_data, epoch_idx, loss_func=None, show_progress=False):
+        if epoch_idx < self.warm_up_epochs:
+            loss_func = self.model.calculate_rec_loss
+        else:
+            self.model.subgraph_construction()
+        return super()._train_epoch(train_data, epoch_idx, loss_func, show_progress)
