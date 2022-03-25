@@ -73,7 +73,7 @@ class NISER(SequentialRecommender):
 
         seq_hidden = hidden[alias_inputs]
         batch_size = seq_hidden.shape[0]
-        pos_emb = self.pos_embedding.weight
+        pos_emb = self.pos_embedding.weight[:seq_hidden.shape[1]]
         pos_emb = pos_emb.unsqueeze(0).expand(batch_size, -1, -1)
         seq_hidden = seq_hidden + pos_emb
         # fetch the last hidden state of last timestamp

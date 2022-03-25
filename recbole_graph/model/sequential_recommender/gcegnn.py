@@ -180,7 +180,7 @@ class GCEGNN(SequentialRecommender):
         h_local = self.local_agg(h, edge_index, edge_attr)
 
         # global
-        item_neighbors = [x[alias_inputs]]
+        item_neighbors = [F.pad(x[alias_inputs], (0, self.max_seq_length - x[alias_inputs].shape[1]), "constant", 0)]
         weight_neighbors = []
         support_size = self.max_seq_length
 
@@ -221,6 +221,7 @@ class GCEGNN(SequentialRecommender):
             entity_vectors = entity_vectors_next_iter
 
         h_global = entity_vectors[0].view(batch_size, self.max_seq_length, self.embedding_size)
+        h_global = h_global[:,:alias_inputs.shape[1],:]
 
         h_local = F.dropout(h_local, self.dropout_local, training=self.training)
         h_global = F.dropout(h_global, self.dropout_global, training=self.training)
