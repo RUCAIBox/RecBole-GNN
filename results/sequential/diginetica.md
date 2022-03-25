@@ -56,10 +56,10 @@ embedding_size: 64
 | -------------------- | --------- | ------ | ------- | ------ | ------------ |
 | **SR-GNN**           | 0.3881    | 0.1754 | 0.2253  | 0.3881 | 0.0388       |
 | **GC-SAN**           | 0.4127    | 0.1881 | 0.2408  | 0.4127 | 0.0413       |
-| **NISER+**           |           |        |         |        |              |
-| **LESSR**            |           |        |         |        |              |
-| **TAGNN**            |           |        |         |        |              |
-| **GCE-GNN**          |           |        |         |        |              |
+| **NISER+**           | 0.4144    | 0.1904 | 0.2430  | 0.4144 | 0.0414       |
+| **LESSR**            | 0.3964    | 0.1763 | 0.2279  | 0.3964 | 0.0396       |
+| **TAGNN**            | 0.3894    | 0.1763 | 0.2263  | 0.3894 | 0.0389       |
+| **GCE-GNN**          | 0.4284    | 0.1961 | 0.2507  | 0.4284 | 0.0428       |
 
 # Hyper-parameters
 
@@ -67,3 +67,7 @@ embedding_size: 64
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | **SR-GNN**            | learning_rate=0.001<br />step=1                              | learning_rate in [0.01, 0.001, 0.0001]<br />step in [1, 2]    |
 | **GC-SAN**            | learning_rate=0.001<br />step=1                              | learning_rate in [0.01, 0.001, 0.0001]<br />step in [1, 2]    |
+| **NISER+**            | learning_rate=0.001<br />sigma=16                              | learning_rate in [0.01, 0.001, 0.003]<br />sigma in [10, 16, 20]    |
+| **LESSR**            | learning_rate=0.001<br />n_layers=4                              | learning_rate in [0.01, 0.001, 0.003]<br />n_layers in [2, 4]    |
+| **TAGNN**            | learning_rate=0.001                              | learning_rate in [0.01, 0.001, 0.003]<br />train_batch_size=512    |
+| **GCE-GNN**            | learning_rate=0.001<br />dropout_global=0.5                              | learning_rate in [0.01, 0.001, 0.003]<br />dropout_global in [0.2, 0.5]    |
