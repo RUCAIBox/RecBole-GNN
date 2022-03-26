@@ -44,19 +44,12 @@ class DiffNet(SocialRecommender):
         self.embedding_size = config['embedding_size']  # int type:the embedding size of DiffNet
         self.n_layers = config['n_layers']  # int type:the GCN layer num of DiffNet for social net
         self.pretrained_review = config['pretrained_review']  # bool type:whether to load pre-trained review vectors of users and items
-        self.loss_type = config['loss_type']  # string type:the loss type of optimization
 
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.embedding_size)
         self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.embedding_size)
         self.bipartite_gcn_conv = BipartiteGCNConv(dim=self.embedding_size)
-
-        if self.loss_type == 'BCE':
-            self.loss_fct = torch.nn.BCELoss()
-        elif self.loss_type == 'L2':
-            self.loss_fct = EmbLoss()
-        else:
-            raise NotImplementedError("Make sure 'loss_type' in ['BCE', 'L2']!")
+        self.loss_fct = EmbLoss()
 
         # storage variables for full sort evaluation acceleration
         self.restore_user_e = None
@@ -124,11 +117,8 @@ class DiffNet(SocialRecommender):
         i_embeddings = item_all_embeddings[item]
         prediction = torch.sigmoid(torch.mul(u_embeddings, i_embeddings).sum(dim=1))
 
-        if self.loss_type == 'BCE':
-            return self.loss_fct(prediction, label)
-        else:  # self.loss_type = 'L2'
-            loss = self.loss_fct(label - prediction, require_pow=True)
-            return loss
+        loss = self.loss_fct(label - prediction, require_pow=True)
+        return loss
 
     def predict(self, interaction):
         user = interaction[self.USER_ID]
