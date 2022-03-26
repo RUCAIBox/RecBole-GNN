@@ -61,4 +61,4 @@ embedding_size: 64
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | **DiffNet**           | learning_rate=0.005<br />n_layers=2                           | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]   |
 | **GraphRec**          | learning_rate=0.005<br />mlp_layer_num=2                              | learning_rate in [0.005, 0.001, 0.0005]<br />mlp_layer_num in [1, 2, 3]    |
-| **SEPT+**             | learning_rate=0.005<br />n_layers=2<br />ssl_weight=1e-05                              | learning_rate in [0.005, 0.001, 0.0005]<br />n_layers in [1, 2, 3]<br />ssl_weight in [1e-2, 5e-3, 1e-3, 1e-4, 1e-5]    |
+| **SEPT**             | learning_rate=0.005<br />n_layers=2<br />ssl_weight=1e-05                              | learning_rate in [0.005, 0.001, 0.0005]<br />n_layers in [1, 2, 3]<br />ssl_weight in [1e-2, 5e-3, 1e-3, 1e-4, 1e-5]    |
