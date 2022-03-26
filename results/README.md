@@ -7,3 +7,5 @@
 * [diginetica](sequential/diginetica.md)
 
 ## Social-aware Model Results
+
+* [lastfm](social/lastfm.md)
