@@ -51,7 +51,7 @@ embedding_size: 64
 
 | Method               | Recall@10 | MRR@10 | NDCG@10 | Hit@10 | Precision@10 |
 | -------------------- | --------- | ------ | ------- | ------ | ------------ |
-| **DiffNet**          | 0.6069    | 0.7193 | 0.6855  | 0.7730 | 0.2939       |
+| **DiffNet**          | 0.5784    | 0.6263 | 0.5943  | 0.7714 | 0.2499       |
 | **GraphRec**         | 0.1982    | 0.2216 | 0.1768  | 0.4038 | 0.0828       |
 | **SEPT**             | 0.5638    | 0.6991 | 0.6383  | 0.7659 | 0.2612       |
 
@@ -59,6 +59,6 @@ embedding_size: 64
 
 |                      | Best hyper-parameters                                                     | Tuning range                                                     |
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| **DiffNet**           | learning_rate=0.001<br />n_layers=1<br />loss_type='BCE'                              | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]<br /> loss_type in ['BCE', 'L2']   |
+| **DiffNet**           | learning_rate=0.005<br />n_layers=2                           | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]   |
 | **GraphRec**          | learning_rate=0.005<br />mlp_layer_num=2                              | learning_rate in [0.005, 0.001, 0.0005]<br />mlp_layer_num in [1, 2, 3]    |
 | **SEPT+**             | learning_rate=0.005<br />n_layers=2<br />ssl_weight=1e-05                              | learning_rate in [0.005, 0.001, 0.0005]<br />n_layers in [1, 2, 3]<br />ssl_weight in [1e-2, 5e-3, 1e-3, 1e-4, 1e-5]    |
