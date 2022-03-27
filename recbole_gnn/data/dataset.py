@@ -201,7 +201,7 @@ class GCEGNNDataset(SequentialDataset):
 
 
 class SocialDataset(GeneralGraphDataset):
-    """:class:`SocialDataset` is based on :class:`~recbole_graph.data.dataset.GeneralGraphDataset`,
+    """:class:`SocialDataset` is based on :class:`~recbole_gnn.data.dataset.GeneralGraphDataset`,
     and load ``.net``.
 
     All users in ``.inter`` and ``.net`` are remapped into the same ID sections.

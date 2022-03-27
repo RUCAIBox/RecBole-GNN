@@ -1,7 +1,7 @@
 from recbole.model.abstract_recommender import GeneralRecommender
 from recbole.utils import ModelType as RecBoleModelType
 
-from recbole_graph.utils import ModelType
+from recbole_gnn.utils import ModelType
 
 
 class GeneralGraphRecommender(GeneralRecommender):
