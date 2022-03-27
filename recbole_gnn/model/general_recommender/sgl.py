@@ -21,8 +21,8 @@ from recbole.model.init import xavier_uniform_initialization
 from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
 
-from recbole_graph.model.abstract_recommender import GeneralGraphRecommender
-from recbole_graph.model.layers import LightGCNConv
+from recbole_gnn.model.abstract_recommender import GeneralGraphRecommender
+from recbole_gnn.model.layers import LightGCNConv
 
 
 class SGL(GeneralGraphRecommender):

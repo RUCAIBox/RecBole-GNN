@@ -1,6 +1,6 @@
 from recbole.data.dataloader.general_dataloader import TrainDataLoader, FullSortEvalDataLoader
 
-from recbole_graph.data.transform import construct_transform
+from recbole_gnn.data.transform import construct_transform
 
 
 class CustomizedTrainDataLoader(TrainDataLoader):

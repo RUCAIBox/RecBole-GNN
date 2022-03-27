@@ -2,11 +2,11 @@ import logging
 from logging import getLogger
 from recbole.utils import init_logger, init_seed, set_color
 
-from recbole_graph.config import Config
-from recbole_graph.utils import create_dataset, data_preparation, get_model, get_trainer
+from recbole_gnn.config import Config
+from recbole_gnn.utils import create_dataset, data_preparation, get_model, get_trainer
 
 
-def run_recbole_graph(model=None, dataset=None, config_file_list=None, config_dict=None, saved=True):
+def run_recbole_gnn(model=None, dataset=None, config_file_list=None, config_dict=None, saved=True):
     r""" A fast running api, which includes the complete process of
     training and testing a model on a specified dataset
     Args:

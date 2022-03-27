@@ -10,7 +10,7 @@ from recbole.utils import get_model as get_recbole_model
 from recbole.utils import get_trainer as get_recbole_trainer
 from recbole.utils.argument_list import dataset_arguments
 
-from recbole_graph.data.dataloader import CustomizedTrainDataLoader, CustomizedFullSortEvalDataLoader
+from recbole_gnn.data.dataloader import CustomizedTrainDataLoader, CustomizedFullSortEvalDataLoader
 
 
 def create_dataset(config):
@@ -24,9 +24,9 @@ def create_dataset(config):
         Dataset: Constructed dataset.
     """
     model_type = config['MODEL_TYPE']
-    dataset_module = importlib.import_module('recbole_graph.data.dataset')
-    gen_graph_module_path = '.'.join(['recbole_graph.model.general_recommender', config['model'].lower()])
-    seq_module_path = '.'.join(['recbole_graph.model.sequential_recommender', config['model'].lower()])
+    dataset_module = importlib.import_module('recbole_gnn.data.dataset')
+    gen_graph_module_path = '.'.join(['recbole_gnn.model.general_recommender', config['model'].lower()])
+    seq_module_path = '.'.join(['recbole_gnn.model.sequential_recommender', config['model'].lower()])
     if hasattr(dataset_module, config['model'] + 'Dataset'):
         dataset_class = getattr(dataset_module, config['model'] + 'Dataset')
     elif importlib.util.find_spec(gen_graph_module_path, __name__):
@@ -73,7 +73,7 @@ def get_model(model_name):
     model_file_name = model_name.lower()
     model_module = None
     for submodule in model_submodule:
-        module_path = '.'.join(['recbole_graph.model', submodule, model_file_name])
+        module_path = '.'.join(['recbole_gnn.model', submodule, model_file_name])
         if importlib.util.find_spec(module_path, __name__):
             model_module = importlib.import_module(module_path, __name__)
             break
@@ -109,7 +109,7 @@ def data_preparation(config, dataset):
             - valid_data (AbstractDataLoader): The dataloader for validation.
             - test_data (AbstractDataLoader): The dataloader for testing.
     """
-    seq_module_path = '.'.join(['recbole_graph.model.sequential_recommender', config['model'].lower()])
+    seq_module_path = '.'.join(['recbole_gnn.model.sequential_recommender', config['model'].lower()])
     if importlib.util.find_spec(seq_module_path, __name__):
         # Special condition for sequential models of RecBole-Graph
         dataloaders = load_split_dataloaders(config)
@@ -151,7 +151,7 @@ def get_trainer(model_type, model_name):
         Trainer: trainer class
     """
     try:
-        return getattr(importlib.import_module('recbole_graph.trainer'), model_name + 'Trainer')
+        return getattr(importlib.import_module('recbole_gnn.trainer'), model_name + 'Trainer')
     except AttributeError:
         return get_recbole_trainer(model_type, model_name)
 

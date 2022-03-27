@@ -1,53 +1,51 @@
 # @Time   : 2022/3/8
-# @Author : Changxin Tian
-# @Email  : cx.tian@outlook.com
+# @Author : Lanling Xu
+# @Email  : xulanling_sherry@163.com
+
 r"""
-NGCF
+LightGCN
 ################################################
 Reference:
-    Xiang Wang et al. "Neural Graph Collaborative Filtering." in SIGIR 2019.
+    Xiangnan He et al. "LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation." in SIGIR 2020.
 
 Reference code:
-    https://github.com/xiangwang1223/neural_graph_collaborative_filtering
-
+    https://github.com/kuandeng/LightGCN
 """
 
+import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch_geometric.utils import dropout_adj
 
-from recbole.model.init import xavier_normal_initialization
+from recbole.model.init import xavier_uniform_initialization
 from recbole.model.loss import BPRLoss, EmbLoss
 from recbole.utils import InputType
 
-from recbole_graph.model.abstract_recommender import GeneralGraphRecommender
-from recbole_graph.model.layers import BiGNNConv
+from recbole_gnn.model.abstract_recommender import GeneralGraphRecommender
+from recbole_gnn.model.layers import LightGCNConv
 
 
-class NGCF(GeneralGraphRecommender):
-    r"""NGCF is a model that incorporate GNN for recommendation.
+class LightGCN(GeneralGraphRecommender):
+    r"""LightGCN is a GCN-based recommender model, implemented via PyG.
+    LightGCN includes only the most essential component in GCN — neighborhood aggregation — for
+    collaborative filtering. Specifically, LightGCN learns user and item embeddings by linearly 
+    propagating them on the user-item interaction graph, and uses the weighted sum of the embeddings
+    learned at all layers as the final embedding.
     We implement the model following the original author with a pairwise training mode.
     """
     input_type = InputType.PAIRWISE
 
     def __init__(self, config, dataset):
-        super(NGCF, self).__init__(config, dataset)
+        super(LightGCN, self).__init__(config, dataset)
 
         # load parameters info
-        self.embedding_size = config['embedding_size']
-        self.hidden_size_list = config['hidden_size_list']
-        self.hidden_size_list = [self.embedding_size] + self.hidden_size_list
-        self.node_dropout = config['node_dropout']
-        self.message_dropout = config['message_dropout']
-        self.reg_weight = config['reg_weight']
+        self.latent_dim = config['embedding_size']  # int type:the embedding size of lightGCN
+        self.n_layers = config['n_layers']  # int type:the layer num of lightGCN
+        self.reg_weight = config['reg_weight']  # float32 type: the weight decay for l2 normalization
+        self.require_pow = config['require_pow']  # bool type: whether to require pow when regularization
 
         # define layers and loss
-        self.user_embedding = nn.Embedding(self.n_users, self.embedding_size)
-        self.item_embedding = nn.Embedding(self.n_items, self.embedding_size)
-        self.GNNlayers = torch.nn.ModuleList()
-        for input_size, output_size in zip(self.hidden_size_list[:-1], self.hidden_size_list[1:]):
-            self.GNNlayers.append(BiGNNConv(input_size, output_size))
+        self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.latent_dim)
+        self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.latent_dim)
+        self.gcn_conv = LightGCNConv(dim=self.latent_dim)
         self.mf_loss = BPRLoss()
         self.reg_loss = EmbLoss()
 
@@ -56,14 +54,13 @@ class NGCF(GeneralGraphRecommender):
         self.restore_item_e = None
 
         # parameters initialization
-        self.apply(xavier_normal_initialization)
+        self.apply(xavier_uniform_initialization)
         self.other_parameter_name = ['restore_user_e', 'restore_item_e']
 
     def get_ego_embeddings(self):
         r"""Get the embedding of users and items and combine to an embedding matrix.
-
         Returns:
-            Tensor of the embedding matrix. Shape of (n_items+n_users, embedding_dim)
+            Tensor of the embedding matrix. Shape of [n_items+n_users, embedding_dim]
         """
         user_embeddings = self.user_embedding.weight
         item_embeddings = self.item_embedding.weight
@@ -71,23 +68,16 @@ class NGCF(GeneralGraphRecommender):
         return ego_embeddings
 
     def forward(self):
-        if self.node_dropout == 0:
-            edge_index, edge_weight = self.edge_index, self.edge_weight
-        else:
-            edge_index, edge_weight = dropout_adj(edge_index=self.edge_index, edge_attr=self.edge_weight, p=self.node_dropout)
-
         all_embeddings = self.get_ego_embeddings()
         embeddings_list = [all_embeddings]
-        for gnn in self.GNNlayers:
-            all_embeddings = gnn(all_embeddings, edge_index, edge_weight)
-            all_embeddings = nn.LeakyReLU(negative_slope=0.2)(all_embeddings)
-            all_embeddings = nn.Dropout(self.message_dropout)(all_embeddings)
-            all_embeddings = F.normalize(all_embeddings, p=2, dim=1)
-            embeddings_list += [all_embeddings]  # storage output embedding of each layer
-        ngcf_all_embeddings = torch.cat(embeddings_list, dim=1)
 
-        user_all_embeddings, item_all_embeddings = torch.split(ngcf_all_embeddings, [self.n_users, self.n_items])
+        for layer_idx in range(self.n_layers):
+            all_embeddings = self.gcn_conv(all_embeddings, self.edge_index, self.edge_weight)
+            embeddings_list.append(all_embeddings)
+        lightgcn_all_embeddings = torch.stack(embeddings_list, dim=1)
+        lightgcn_all_embeddings = torch.mean(lightgcn_all_embeddings, dim=1)
 
+        user_all_embeddings, item_all_embeddings = torch.split(lightgcn_all_embeddings, [self.n_users, self.n_items])
         return user_all_embeddings, item_all_embeddings
 
     def calculate_loss(self, interaction):
@@ -104,13 +94,20 @@ class NGCF(GeneralGraphRecommender):
         pos_embeddings = item_all_embeddings[pos_item]
         neg_embeddings = item_all_embeddings[neg_item]
 
+        # calculate BPR Loss
         pos_scores = torch.mul(u_embeddings, pos_embeddings).sum(dim=1)
         neg_scores = torch.mul(u_embeddings, neg_embeddings).sum(dim=1)
-        mf_loss = self.mf_loss(pos_scores, neg_scores)  # calculate BPR Loss
+        mf_loss = self.mf_loss(pos_scores, neg_scores)
 
-        reg_loss = self.reg_loss(u_embeddings, pos_embeddings, neg_embeddings)  # L2 regularization of embeddings
+        # calculate regularization Loss
+        u_ego_embeddings = self.user_embedding(user)
+        pos_ego_embeddings = self.item_embedding(pos_item)
+        neg_ego_embeddings = self.item_embedding(neg_item)
 
-        return mf_loss + self.reg_weight * reg_loss
+        reg_loss = self.reg_loss(u_ego_embeddings, pos_ego_embeddings, neg_ego_embeddings, require_pow=self.require_pow)
+        loss = mf_loss + self.reg_weight * reg_loss
+
+        return loss
 
     def predict(self, interaction):
         user = interaction[self.USER_ID]

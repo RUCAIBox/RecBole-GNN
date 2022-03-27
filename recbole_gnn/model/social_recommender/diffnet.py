@@ -19,8 +19,8 @@ from recbole.model.init import xavier_uniform_initialization
 from recbole.model.loss import EmbLoss
 from recbole.utils import InputType
 
-from recbole_graph.model.abstract_recommender import SocialRecommender
-from recbole_graph.model.layers import BipartiteGCNConv
+from recbole_gnn.model.abstract_recommender import SocialRecommender
+from recbole_gnn.model.layers import BipartiteGCNConv
 
 
 class DiffNet(SocialRecommender):

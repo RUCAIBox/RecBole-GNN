@@ -1,7 +1,7 @@
 import argparse
 
 from recbole.trainer import HyperTuning
-from recbole_graph.quick_start import objective_function
+from recbole_gnn.quick_start import objective_function
 
 
 def main():
