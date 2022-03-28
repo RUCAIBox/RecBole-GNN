@@ -1,0 +1,65 @@
+# Experimental Setting
+
+**Dataset:** [MovieLens-1M](https://grouplens.org/datasets/movielens/)
+
+**Filtering:** Remove interactions with a rating score of less than 3
+
+**Evaluation:** ratio-based 8:1:1, full sort
+
+**Metrics:** Recall@10, NGCG@10, MRR@10, Hit@10, Precision@10
+
+**Properties:**
+
+```yaml
+# dataset config
+field_separator: "\t"
+seq_separator: " "
+USER_ID_FIELD: user_id
+ITEM_ID_FIELD: item_id
+RATING_FIELD: rating
+NEG_PREFIX: neg_
+LABEL_FIELD: label
+load_col:
+    inter: [user_id, item_id, rating]
+val_interval:
+    rating: "[3,inf)"
+unused_col: 
+    inter: [rating]
+
+# training and evaluation
+epochs: 500
+train_batch_size: 4096
+valid_metric: MRR@10
+eval_batch_size: 4096000
+```
+
+For fairness, we restrict users' and items' embedding dimension as following. Please adjust the name of the corresponding args of different models.
+```
+embedding_size: 64
+```
+
+# Dataset Statistics
+
+| Dataset    | #Users | #Items | #Interactions | Sparsity |
+| ---------- | ------ | ------ | ------------- | -------- |
+| ml-1m      | 6,040  | 3,629  | 836,478       | 96.18%   |
+
+# Evaluation Results
+
+| Method               | Recall@10 | MRR@10 | NDCG@10 | Hit@10 | Precision@10 |
+| -------------------- | --------- | ------ | ------- | ------ | ------------ |
+| **NGCF**             | 0.1814    | 0.4354 | 0.2508  | 0.7239 | 0.1850       |
+| **LightGCN**         | 0.1861    | 0.4388 | 0.2538  | 0.7330 | 0.1863       |
+| **SGL**              | 0.1889    | 0.4315 | 0.2505  | 0.7392 | 0.1843       |
+| **HMLET**            | 0.1847    | 0.4297 | 0.2490  | 0.7305 | 0.1836       |
+| **NCL**              | 0.2021    | 0.4599 | 0.2702  | 0.7565 | 0.1962       |
+
+# Hyper-parameters
+
+|              | Best hyper-parameters                                        | Tuning range                                                 |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **NGCF**     | learning_rate=0.0002<br />message_dropout=0.0<br />node_dropout=0.0 | learning_rate choice [0.001, 0.0005, 0.0002]<br/>node_dropout choice [0.0, 0.1]<br/>message_dropout choice [0.0, 0.1] |
+| **LightGCN** | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001   | learning_rate choice [0.005, 0.002, 0.001]<br/>n_layers choice [2, 3]<br/>reg_weight choice [1e-4, 1e-5] |
+| **SGL**      | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001<br />ssl_tau=0.5<br />drop_ratio=0.1<br />ssl_weight=0.005 | learning_rate choice [0.002]<br/>n_layers choice [3]<br/>reg_weight choice [1e-4]<br/>ssl_tau choice [0.1, 0.5]<br/>drop_ratio choice [0.1, 0.3]<br/>ssl_weight choice [1e-5, 1e-6, 1e-7, 0.005, 0.01, 0.05] |
+| **HMLET**    | learning_rate=0.002<br />n_layers=4<br />activation_function=leakyrelu | learning_rate choice [0.002, 0.001, 0.0005]<br/>n_layers choice [3, 4]<br/>activation_function choice ['elu', 'leakyrelu'] |
+| **NCL**      | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001<br />ssl_temp=0.1<br />ssl_reg=1e-06<br />hyper_layers=1<br />alpha=1.5 | learning_rate choice [0.002]<br/>n_layers choice [3]<br/>reg_weight choice [1e-4]<br/>ssl_temp choice [0.1, 0.05]<br/>ssl_reg choice [1e-7, 1e-6]<br/>hyper_layers choice [1]<br/>alpha choice [1, 0.8, 1.5] |
