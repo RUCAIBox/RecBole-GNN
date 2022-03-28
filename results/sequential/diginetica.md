@@ -60,6 +60,7 @@ embedding_size: 64
 | **LESSR**            | 0.3964    | 0.1763 | 0.2279  | 0.3964 | 0.0396       |
 | **TAGNN**            | 0.3894    | 0.1763 | 0.2263  | 0.3894 | 0.0389       |
 | **GCE-GNN**          | 0.4284    | 0.1961 | 0.2507  | 0.4284 | 0.0428       |
+| **SGNN-HN**          | 0.4183    | 0.1877 | 0.2418  | 0.4183 | 0.0418       |
 
 # Hyper-parameters
 
@@ -71,3 +72,4 @@ embedding_size: 64
 | **LESSR**            | learning_rate=0.001<br />n_layers=4                              | learning_rate in [0.01, 0.001, 0.003]<br />n_layers in [2, 4]    |
 | **TAGNN**            | learning_rate=0.001                              | learning_rate in [0.01, 0.001, 0.003]<br />train_batch_size=512    |
 | **GCE-GNN**            | learning_rate=0.001<br />dropout_global=0.5                              | learning_rate in [0.01, 0.001, 0.003]<br />dropout_global in [0.2, 0.5]    |
+| **SGNN-HN**            | learning_rate=0.003<br />scale=12<br />step=2                              | learning_rate in [0.01, 0.001, 0.003]<br />scale in [12, 16, 20]<br />step in [2, 4, 6]    |
