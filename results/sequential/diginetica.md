@@ -54,6 +54,9 @@ embedding_size: 64
 
 | Method               | Recall@10 | MRR@10 | NDCG@10 | Hit@10 | Precision@10 |
 | -------------------- | --------- | ------ | ------- | ------ | ------------ |
+| **GRU4Rec**          | 0.3691    | 0.1632 | 0.2114  | 0.3691 | 0.0369       |
+| **NARM**             | 0.3801    | 0.1695 | 0.2188  | 0.3801 | 0.0380       |
+| **SASRec**           | 0.4144    | 0.1857 | 0.2393  | 0.4144 | 0.0414       |
 | **SR-GNN**           | 0.3881    | 0.1754 | 0.2253  | 0.3881 | 0.0388       |
 | **GC-SAN**           | 0.4127    | 0.1881 | 0.2408  | 0.4127 | 0.0413       |
 | **NISER+**           | 0.4144    | 0.1904 | 0.2430  | 0.4144 | 0.0414       |
@@ -66,6 +69,9 @@ embedding_size: 64
 
 |                      | Best hyper-parameters                                                     | Tuning range                                                     |
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **GRU4Rec** | learning_rate=0.01<br />hidden_size=128<br />dropout_prob=0.3<br />num_layers=1 | learning_rate in [1e-2, 1e-3, 3e-3]<br />num_layers in [1, 2, 3]<br />hidden_size in [128]<br />dropout_prob in [0.1, 0.2, 0.3] |
+| **SASRec**           | learning_rate=0.001<br />n_layers=2<br />attn_dropout_prob=0.2<br />hidden_dropout_prob=0.2 | learning_rate in [0.001, 0.0001]<br />n_layers in [1, 2]<br />hidden_dropout_prob in [0.2, 0.5]<br />attn_dropout_prob in [0.2, 0.5] |
+| **NARM**             | learning_rate=0.001<br />hidden_size=128<br />n_layers=1<br />dropout_probs=[0.25, 0.5] | learning_rate in [0.001, 0.01, 0.03]<br />hidden_size in [128]<br />n_layers in [1, 2]<br />dropout_probs in ['[0.25,0.5]', '[0.2,0.2]', '[0.1,0.2]'] |
 | **SR-GNN**            | learning_rate=0.001<br />step=1                              | learning_rate in [0.01, 0.001, 0.0001]<br />step in [1, 2]    |
 | **GC-SAN**            | learning_rate=0.001<br />step=1                              | learning_rate in [0.01, 0.001, 0.0001]<br />step in [1, 2]    |
 | **NISER+**            | learning_rate=0.001<br />sigma=16                              | learning_rate in [0.01, 0.001, 0.003]<br />sigma in [10, 16, 20]    |
