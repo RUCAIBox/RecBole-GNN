@@ -14,9 +14,10 @@ Reference code:
 
 import numpy as np
 import torch
+import torch.nn as nn
 
 from recbole.model.init import xavier_uniform_initialization
-from recbole.model.loss import EmbLoss
+from recbole.model.loss import BPRLoss, EmbLoss
 from recbole.utils import InputType
 
 from recbole_graph.model.abstract_recommender import SocialRecommender
@@ -25,9 +26,9 @@ from recbole_graph.model.layers import BipartiteGCNConv
 
 class DiffNet(SocialRecommender):
     r"""DiffNet is a deep influence propagation model to stimulate how users are influenced by the recursive social diffusion process for social recommendation.
-    We implement the model following the original author with a pointwise training mode.
+    We implement the model following the original author with a pairwise training mode.
     """
-    input_type = InputType.POINTWISE
+    input_type = InputType.PAIRWISE
 
     def __init__(self, config, dataset):
         super(DiffNet, self).__init__(config, dataset)
@@ -40,16 +41,17 @@ class DiffNet(SocialRecommender):
         self.net_edge_index, self.net_edge_weight = self.net_edge_index.to(self.device), self.net_edge_weight.to(self.device)
 
         # load parameters info
-        self.LABEL = config['LABEL_FIELD']
         self.embedding_size = config['embedding_size']  # int type:the embedding size of DiffNet
         self.n_layers = config['n_layers']  # int type:the GCN layer num of DiffNet for social net
+        self.reg_weight = config['reg_weight']  # float32 type: the weight decay for l2 normalization
         self.pretrained_review = config['pretrained_review']  # bool type:whether to load pre-trained review vectors of users and items
 
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(num_embeddings=self.n_users, embedding_dim=self.embedding_size)
         self.item_embedding = torch.nn.Embedding(num_embeddings=self.n_items, embedding_dim=self.embedding_size)
         self.bipartite_gcn_conv = BipartiteGCNConv(dim=self.embedding_size)
-        self.loss_fct = EmbLoss()
+        self.mf_loss = BPRLoss()
+        self.reg_loss = EmbLoss()
 
         # storage variables for full sort evaluation acceleration
         self.restore_user_e = None
@@ -61,17 +63,17 @@ class DiffNet(SocialRecommender):
 
         if self.pretrained_review:
             # handle review information, map the origin review into the new space
-            self.user_review_embedding = torch.nn.Embedding(self.n_users, self.embedding_size, padding_idx=0)
+            self.user_review_embedding = nn.Embedding(self.n_users, self.embedding_size, padding_idx=0)
             self.user_review_embedding.weight.requires_grad = False
             self.user_review_embedding.weight.data.copy_(self.convertDistribution(dataset.user_feat['user_review_emb']))
 
-            self.item_review_embedding = torch.nn.Embedding(self.n_items, self.embedding_size, padding_idx=0)
+            self.item_review_embedding = nn.Embedding(self.n_items, self.embedding_size, padding_idx=0)
             self.item_review_embedding.weight.requires_grad = False
             self.item_review_embedding.weight.data.copy_(self.convertDistribution(dataset.item_feat['item_review_emb']))
 
-            self.user_fusion_layer = torch.nn.Linear(self.embedding_size, self.embedding_size)
-            self.item_fusion_layer = torch.nn.Linear(self.embedding_size, self.embedding_size)
-            self.activation = torch.nn.Sigmoid()
+            self.user_fusion_layer = nn.Linear(self.embedding_size, self.embedding_size)
+            self.item_fusion_layer = nn.Linear(self.embedding_size, self.embedding_size)
+            self.activation = nn.Sigmoid()
 
     def convertDistribution(self, x):
         mean, std = torch.mean(x), torch.std(x)
@@ -94,7 +96,7 @@ class DiffNet(SocialRecommender):
 
         user_embedding_from_consumed_items = self.bipartite_gcn_conv(x=(final_item_embedding, user_embedding), edge_index=self.edge_index, edge_weight=self.edge_weight, size=(self.n_items, self.n_users))
 
-        embeddings_list = []
+        embeddings_list = [user_embedding]
         for layer_idx in range(self.n_layers):
             user_embedding = self.bipartite_gcn_conv((user_embedding, user_embedding), self.net_edge_index, self.net_edge_weight, size=(self.n_users, self.n_users))
             embeddings_list.append(user_embedding)
@@ -109,15 +111,27 @@ class DiffNet(SocialRecommender):
             self.restore_user_e, self.restore_item_e = None, None
 
         user = interaction[self.USER_ID]
-        item = interaction[self.ITEM_ID]
-        label = interaction[self.LABEL]
+        pos_item = interaction[self.ITEM_ID]
+        neg_item = interaction[self.NEG_ITEM_ID]
 
         user_all_embeddings, item_all_embeddings = self.forward()
         u_embeddings = user_all_embeddings[user]
-        i_embeddings = item_all_embeddings[item]
-        prediction = torch.sigmoid(torch.mul(u_embeddings, i_embeddings).sum(dim=1))
+        pos_embeddings = item_all_embeddings[pos_item]
+        neg_embeddings = item_all_embeddings[neg_item]
 
-        loss = self.loss_fct(label - prediction, require_pow=True)
+        # calculate BPR Loss
+        pos_scores = torch.mul(u_embeddings, pos_embeddings).sum(dim=1)
+        neg_scores = torch.mul(u_embeddings, neg_embeddings).sum(dim=1)
+        mf_loss = self.mf_loss(pos_scores, neg_scores)
+
+        # calculate regularization Loss
+        u_ego_embeddings = self.user_embedding(user)
+        pos_ego_embeddings = self.item_embedding(pos_item)
+        neg_ego_embeddings = self.item_embedding(neg_item)
+
+        reg_loss = self.reg_loss(u_ego_embeddings, pos_ego_embeddings, neg_ego_embeddings)
+        loss = mf_loss + self.reg_weight * reg_loss
+
         return loss
 
     def predict(self, interaction):
