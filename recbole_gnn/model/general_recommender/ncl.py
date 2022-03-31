@@ -6,17 +6,15 @@ Reference:
     Zihan Lin*, Changxin Tian*, Yupeng Hou*, Wayne Xin Zhao. "Improving Graph Collaborative Filtering with Neighborhood-enriched Contrastive Learning." in WWW 2022.
 """
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 
-import faiss
 from recbole.model.init import xavier_uniform_initialization
 from recbole.model.loss import BPRLoss, EmbLoss
 from recbole.utils import InputType
 
-from recbole_graph.model.abstract_recommender import GeneralGraphRecommender
-from recbole_graph.model.layers import LightGCNConv
+from recbole_gnn.model.abstract_recommender import GeneralGraphRecommender
+from recbole_gnn.model.layers import LightGCNConv
 
 
 class NCL(GeneralGraphRecommender):
@@ -68,6 +66,7 @@ class NCL(GeneralGraphRecommender):
     def run_kmeans(self, x):
         """Run K-means algorithm to get k clusters of the input tensor x
         """
+        import faiss
         kmeans = faiss.Kmeans(d=self.latent_dim, k=self.k, gpu=True)
         kmeans.train(x)
         cluster_cents = kmeans.centroids

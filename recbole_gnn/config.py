@@ -1,7 +1,7 @@
 import os
 from recbole.config.configurator import Config as RecBole_Config
 
-from recbole_graph.utils import get_model, ModelType
+from recbole_gnn.utils import get_model, ModelType
 
 
 class Config(RecBole_Config):

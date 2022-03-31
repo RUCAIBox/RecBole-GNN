@@ -17,7 +17,7 @@ from recbole.model.layers import TransformerEncoder
 from recbole.model.loss import EmbLoss, BPRLoss
 from recbole.model.abstract_recommender import SequentialRecommender
 
-from recbole_graph.model.layers import SRGNNCell
+from recbole_gnn.model.layers import SRGNNCell
 
 
 class GCSAN(SequentialRecommender):
