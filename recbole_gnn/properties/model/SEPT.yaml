@@ -1,4 +1,4 @@
-warm_up_epochs: 50
+warm_up_epochs: 100
 embedding_size: 64
 n_layers: 2
 drop_ratio: 0.3
