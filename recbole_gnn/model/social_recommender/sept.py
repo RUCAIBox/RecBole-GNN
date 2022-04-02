@@ -72,6 +72,7 @@ class SEPT(SocialRecommender):
         self.reg_loss = EmbLoss()
 
         # storage variables for full sort evaluation acceleration
+        self.user_all_embeddings = None
         self.restore_user_e = None
         self.restore_item_e = None
 
@@ -216,10 +217,10 @@ class SEPT(SocialRecommender):
         pos_item = interaction[self.ITEM_ID]
         neg_item = interaction[self.NEG_ITEM_ID]
 
-        self.restore_user_e, self.restore_item_e = self.forward()
-        u_embeddings = self.restore_user_e[user]
-        pos_embeddings = self.restore_item_e[pos_item]
-        neg_embeddings = self.restore_item_e[neg_item]
+        self.user_all_embeddings, item_all_embeddings = self.forward()
+        u_embeddings = self.user_all_embeddings[user]
+        pos_embeddings = item_all_embeddings[pos_item]
+        neg_embeddings = item_all_embeddings[neg_item]
 
         # calculate BPR Loss
         pos_scores = torch.mul(u_embeddings, pos_embeddings).sum(dim=1)
@@ -250,7 +251,7 @@ class SEPT(SocialRecommender):
         aug_u_embeddings = aug_user_embeddings[user]
         social_u_embeddings = friend_view_embeddings[user]
         sharing_u_embeddings = sharing_view_embeddings[user]
-        rec_u_embeddings = self.restore_user_e[user]
+        rec_u_embeddings = self.user_all_embeddings[user]
 
         aug_u_embeddings = F.normalize(aug_u_embeddings, p=2, dim=1)
         social_u_embeddings = F.normalize(social_u_embeddings, p=2, dim=1)

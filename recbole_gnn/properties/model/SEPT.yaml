@@ -1,8 +1,8 @@
-warm_up_epochs: 50
+warm_up_epochs: 100
 embedding_size: 64
 n_layers: 2
 drop_ratio: 0.3
 instance_cnt: 10
 reg_weight: 1e-05
-ssl_weight: 0.005
+ssl_weight: 1e-07
 ssl_tau: 0.1

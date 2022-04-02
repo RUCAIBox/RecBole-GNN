@@ -45,20 +45,28 @@ embedding_size: 64
 
 | Dataset    | #Users | #Items | #Interactions | Sparsity |
 | ---------- | ------ | ------ | ------------- | -------- |
-| lastfm     | 1,893  | 12,524 | 186,479       | 99.21%   |
+| lastfm     | 1,892  | 17,632 | 92,834        | 99.72%   |
 
 # Evaluation Results
 
 | Method               | Recall@10 | MRR@10 | NDCG@10 | Hit@10 | Precision@10 |
 | -------------------- | --------- | ------ | ------- | ------ | ------------ |
-| **DiffNet**          | 0.5784    | 0.6263 | 0.5943  | 0.7714 | 0.2499       |
-| **GraphRec**         | 0.1982    | 0.2216 | 0.1768  | 0.4038 | 0.0828       |
-| **SEPT**             | 0.5638    | 0.6991 | 0.6383  | 0.7659 | 0.2612       |
+| **BPR**              | 0.1761    | 0.3026 | 0.1674  | 0.5573 | 0.0858       |
+| **NeuMF**            | 0.1696    | 0.2924 | 0.1604  | 0.5456 | 0.0828       |
+| **NGCF**             | 0.1960    | 0.3479 | 0.1898  | 0.6141 | 0.0961       |
+| **LightGCN**         | 0.2064    | 0.3559 | 0.1972  | 0.6322 | 0.1009       |
+| **DiffNet**          | 0.1757    | 0.3117 | 0.1694  | 0.5621 | 0.0857       |
+| **MHCN**             | 0.2123    | 0.3782 | 0.2068  | 0.6523 | 0.1042       |
+| **SEPT**             | 0.2127    | 0.3703 | 0.2057  | 0.6465 | 0.1044       |
 
 # Hyper-parameters
 
 |                      | Best hyper-parameters                                                     | Tuning range                                                     |
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| **DiffNet**           | learning_rate=0.005<br />n_layers=2                           | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]   |
-| **GraphRec**          | learning_rate=0.005<br />mlp_layer_num=2                              | learning_rate in [0.005, 0.001, 0.0005]<br />mlp_layer_num in [1, 2, 3]    |
-| **SEPT**             | learning_rate=0.005<br />n_layers=2<br />ssl_weight=1e-05                              | learning_rate in [0.005, 0.001, 0.0005]<br />n_layers in [1, 2, 3]<br />ssl_weight in [1e-2, 5e-3, 1e-3, 1e-4, 1e-5]    |
+| **BPR**             | learning_rate=0.0005                              | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]    |
+| **NeuMF**           | learning_rate=0.0005<br />dropout_prob=0.1                           | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />dropout_prob in [0.1, 0.2, 0.3]   |
+| **NGCF**              | learning_rate=0.0005<br />hidden_size_list=[64,64,64]                              | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />hidden_size_list in ['[64]', '[64,64]', '[64,64,64]']    |
+| **LightGCN**             | learning_rate=0.001<br />n_layers=3                              | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]    |
+| **DiffNet**           | learning_rate=0.0005<br />n_layers=1                           | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]   |
+| **MHCN**              | learning_rate=0.0005<br />n_layers=2<br />ssl_reg=1e-05                              | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]<br />ssl_reg in [1e-04, 1e-05, 1e-06]    |
+| **SEPT**             | learning_rate=0.0005<br />n_layers=2<br />ssl_weight=1e-07                              | learning_rate in [0.01, 0.005, 0.001, 0.0005, 0.0001]<br />n_layers in [1, 2, 3]<br />ssl_weight in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]    |

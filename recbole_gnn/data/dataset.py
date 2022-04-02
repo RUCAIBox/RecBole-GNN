@@ -38,7 +38,7 @@ class GeneralGraphDataset(RecBoleDataset):
 
         return edge_index, edge_weight
 
-    def get_bipartite_inter_mat(self, row='user'):
+    def get_bipartite_inter_mat(self, row='user', row_norm=True):
         r"""Get the row-normalized bipartite interaction matrix of users and items.
         """
         if row == 'user':
@@ -50,10 +50,18 @@ class GeneralGraphDataset(RecBoleDataset):
         col = self.inter_feat[col_field]
         edge_index = torch.stack([row, col])
 
-        deg = degree(edge_index[0], self.num(row_field))
+        if row_norm:
+            deg = degree(edge_index[0], self.num(row_field))
+            norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
+            edge_weight = norm_deg[edge_index[0]]
+        else:
+            row_deg = degree(edge_index[0], self.num(row_field))
+            col_deg = degree(edge_index[1], self.num(col_field))
 
-        norm_deg = 1. / torch.where(deg == 0, torch.ones([1]), deg)
-        edge_weight = norm_deg[edge_index[0]]
+            row_norm_deg = 1. / torch.sqrt(torch.where(row_deg == 0, torch.ones([1]), row_deg))
+            col_norm_deg = 1. / torch.sqrt(torch.where(col_deg == 0, torch.ones([1]), col_deg))
+
+            edge_weight = row_norm_deg[edge_index[0]] * col_norm_deg[edge_index[1]]
 
         return edge_index, edge_weight
 
