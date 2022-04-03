@@ -48,6 +48,8 @@ embedding_size: 64
 
 | Method               | Recall@10 | MRR@10 | NDCG@10 | Hit@10 | Precision@10 |
 | -------------------- | --------- | ------ | ------- | ------ | ------------ |
+| **BPR**              | 0.1776    | 0.4187 | 0.2401  | 0.7199 | 0.1779       |
+| **NeuMF**            | 0.1651    | 0.4020 | 0.2271  | 0.7029 | 0.1700       |
 | **NGCF**             | 0.1814    | 0.4354 | 0.2508  | 0.7239 | 0.1850       |
 | **LightGCN**         | 0.1861    | 0.4388 | 0.2538  | 0.7330 | 0.1863       |
 | **SGL**              | 0.1889    | 0.4315 | 0.2505  | 0.7392 | 0.1843       |
@@ -58,6 +60,8 @@ embedding_size: 64
 
 |              | Best hyper-parameters                                        | Tuning range                                                 |
 | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **BPR**      | learning_rate=0.001| learning_rate choice [0.05, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005, 0.0002, 0.0001, 0.00005, 0.00002, 0.00001] |
+| **NeuMF**    | learning_rate=0.0001<br />mlp_hidden_size=[32,16,8]<br />dropout_prob=0 | learning_rate choice [0.005, 0.002, 0.001, 0.0005, 0.0002, 0.0001, 0.00005]<br/>mlp_hidden_size choice ['[64,64]', '[64,32]', '[64,32,16]','[32,16,8]']<br/>dropout_prob choice [0, 0.1, 0.2] |
 | **NGCF**     | learning_rate=0.0002<br />message_dropout=0.0<br />node_dropout=0.0 | learning_rate choice [0.001, 0.0005, 0.0002]<br/>node_dropout choice [0.0, 0.1]<br/>message_dropout choice [0.0, 0.1] |
 | **LightGCN** | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001   | learning_rate choice [0.005, 0.002, 0.001]<br/>n_layers choice [2, 3]<br/>reg_weight choice [1e-4, 1e-5] |
 | **SGL**      | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001<br />ssl_tau=0.5<br />drop_ratio=0.1<br />ssl_weight=0.005 | learning_rate choice [0.002]<br/>n_layers choice [3]<br/>reg_weight choice [1e-4]<br/>ssl_tau choice [0.1, 0.5]<br/>drop_ratio choice [0.1, 0.3]<br/>ssl_weight choice [1e-5, 1e-6, 1e-7, 0.005, 0.01, 0.05] |
