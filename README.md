@@ -60,3 +60,17 @@ We list currently supported models according to category:
 ## The Team
 
 RecBole-GNN is developed and maintained by members from [RUCAIBox](http://aibox.ruc.edu.cn/), the main developers are Yupeng Hou ([@hyp1231](https://github.com/hyp1231)), Lanling Xu ([@Sherry-XLL](https://github.com/Sherry-XLL)) and Changxin Tian ([@ChangxinTian](https://github.com/ChangxinTian)).
+
+## Acknowledgement
+
+The implementation is based on the open-source recommendation library [RecBole](https://github.com/RUCAIBox/RecBole).
+
+Please cite the following paper as the reference if you use our code or processed datasets.
+
+```
+@inproceedings{zhao2021recbole,
+  title={Recbole: Towards a unified, comprehensive and efficient framework for recommendation algorithms},
+  author={Wayne Xin Zhao and Shanlei Mu and Yupeng Hou and Zihan Lin and Kaiyuan Li and Yushuo Chen and Yujie Lu and Hui Wang and Changxin Tian and Xingyu Pan and Yingqian Min and Zhichao Feng and Xinyan Fan and Xu Chen and Pengfei Wang and Wendi Ji and Yaliang Li and Xiaoling Wang and Ji-Rong Wen},
+  booktitle={{CIKM}},
+  year={2021}
+}
