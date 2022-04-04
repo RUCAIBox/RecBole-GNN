@@ -5,6 +5,8 @@
 * **Sequential Recommendation** with session/sequence graphs;
 * **Social Recommendation** with social networks.
 
+![](asset/arch.png)
+
 ## Highlights
 
 * **Easy-to-use and unified API**:
