@@ -1,9 +1,15 @@
 # RecBole-GNN
 
+![](asset/recbole-gnn-logo.png)
+
+-----
+
 **RecBole-GNN** is a library built upon [PyTorch](https://pytorch.org) and [RecBole](https://github.com/RUCAIBox/RecBole) for reproducing and developing recommendation algorithms based on graph neural networks (GNNs). Our library includes algorithms covering three major categories:
 * **General Recommendation** with user-item interaction graphs;
 * **Sequential Recommendation** with session/sequence graphs;
 * **Social Recommendation** with social networks.
+
+![](asset/arch.png)
 
 ## Highlights
 
@@ -12,7 +18,7 @@
 * **Efficient and reusable graph processing**:
     We provide highly efficient and reusable basic datasets, dataloaders and layers for graph processing and learning.
 * **Extensive graph library**:
-    Graph neural networks from widely-used library like [PyG](https://github.com/pyg-team/pytorch_geometric) or [DGL](https://github.com/dmlc/dgl) are incorporated. Recently proposed graph algorithms can be easily equipped and compared with existing methods.
+    Graph neural networks from widely-used library like [PyG](https://github.com/pyg-team/pytorch_geometric) are incorporated. Recently proposed graph algorithms can be easily equipped and compared with existing methods.
 
 ## Quick-Start
 
@@ -57,6 +63,36 @@ We list currently supported models according to category:
 * **[MHCN](recbole_gnn/model/social_recommender/mhcn.py)** from Yu *et al.*: [Self-Supervised Multi-Channel Hypergraph Convolutional Network for Social Recommendation](https://doi.org/10.1145/3442381.3449844) (WWW 2021).
 * **[SEPT](recbole_gnn/model/social_recommender/sept.py)** from Yu *et al.*: [Socially-Aware Self-Supervised Tri-Training for Recommendation](https://doi.org/10.1145/3447548.3467340) (KDD 2021).
 
+## Result
+
+### Leaderboard
+
+We carefully tune the hyper-parameters of the implemented models of each research field and release the corresponding leaderboards for reference:
+
+- **General** recommendation on [`MovieLens-1M`](results/general/ml-1m.md) dataset; 
+- **Sequential** recommendation on [`Diginetica`](results/sequential/diginetica.md) dataset; 
+- **Social** recommendation on [`LastFM`](results/social/lastfm.md) dataset; 
+
+### Efficiency
+
+With the sequential/session graphs preprocessing technique, as well as efficient GNN layers, we speed up the training process of our sequential recommenders a lot.
+
+<img src='asset/ml-1m.png' width='25%'><img src='asset/diginetica.png' width='25%'>
+
 ## The Team
 
 RecBole-GNN is developed and maintained by members from [RUCAIBox](http://aibox.ruc.edu.cn/), the main developers are Yupeng Hou ([@hyp1231](https://github.com/hyp1231)), Lanling Xu ([@Sherry-XLL](https://github.com/Sherry-XLL)) and Changxin Tian ([@ChangxinTian](https://github.com/ChangxinTian)).
+
+## Acknowledgement
+
+The implementation is based on the open-source recommendation library [RecBole](https://github.com/RUCAIBox/RecBole).
+
+Please cite the following paper as the reference if you use our code or processed datasets.
+
+```
+@inproceedings{zhao2021recbole,
+  title={Recbole: Towards a unified, comprehensive and efficient framework for recommendation algorithms},
+  author={Wayne Xin Zhao and Shanlei Mu and Yupeng Hou and Zihan Lin and Kaiyuan Li and Yushuo Chen and Yujie Lu and Hui Wang and Changxin Tian and Xingyu Pan and Yingqian Min and Zhichao Feng and Xinyan Fan and Xu Chen and Pengfei Wang and Wendi Ji and Yaliang Li and Xiaoling Wang and Ji-Rong Wen},
+  booktitle={{CIKM}},
+  year={2021}
+}
