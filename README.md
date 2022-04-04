@@ -12,7 +12,7 @@
 * **Efficient and reusable graph processing**:
     We provide highly efficient and reusable basic datasets, dataloaders and layers for graph processing and learning.
 * **Extensive graph library**:
-    Graph neural networks from widely-used library like [PyG](https://github.com/pyg-team/pytorch_geometric) or [DGL](https://github.com/dmlc/dgl) are incorporated. Recently proposed graph algorithms can be easily equipped and compared with existing methods.
+    Graph neural networks from widely-used library like [PyG](https://github.com/pyg-team/pytorch_geometric) are incorporated. Recently proposed graph algorithms can be easily equipped and compared with existing methods.
 
 ## Quick-Start
 
@@ -56,6 +56,14 @@ We list currently supported models according to category:
 * **[GraphRec](recbole_gnn/model/social_recommender/graphrec.py)** from Fan *et al.*: [Graph Neural Networks for Social Recommendation](https://doi.org/10.1145/3308558.3313488) (WWW 2019).
 * **[MHCN](recbole_gnn/model/social_recommender/mhcn.py)** from Yu *et al.*: [Self-Supervised Multi-Channel Hypergraph Convolutional Network for Social Recommendation](https://doi.org/10.1145/3442381.3449844) (WWW 2021).
 * **[SEPT](recbole_gnn/model/social_recommender/sept.py)** from Yu *et al.*: [Socially-Aware Self-Supervised Tri-Training for Recommendation](https://doi.org/10.1145/3447548.3467340) (KDD 2021).
+
+## Leaderboard
+
+We carefully tune the hyper-parameters of the implemented models of each research field and release the corresponding leaderboards for reference:
+
+- **General** recommendation on [`MovieLens-1M`](results/general/ml-1m.md) dataset; 
+- **Sequential** recommendation on [`Diginetica`](results/sequential/diginetica.md) dataset; 
+- **Social** recommendation on [`LastFM`](results/social/lastfm.md) dataset; 
 
 ## The Team
 
