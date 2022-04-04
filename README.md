@@ -1,5 +1,9 @@
 # RecBole-GNN
 
+![](asset/recbole-gnn-logo.png)
+
+-----
+
 **RecBole-GNN** is a library built upon [PyTorch](https://pytorch.org) and [RecBole](https://github.com/RUCAIBox/RecBole) for reproducing and developing recommendation algorithms based on graph neural networks (GNNs). Our library includes algorithms covering three major categories:
 * **General Recommendation** with user-item interaction graphs;
 * **Sequential Recommendation** with session/sequence graphs;
