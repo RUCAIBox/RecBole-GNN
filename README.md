@@ -77,8 +77,7 @@ We carefully tune the hyper-parameters of the implemented models of each researc
 
 With the sequential/session graphs preprocessing technique, as well as efficient GNN layers, we speed up the training process of our sequential recommenders a lot.
 
-<img src='asset/ml-1m.png' width='45%'>
-<img src='asset/diginetica.png' width='45%'>
+<img src='asset/ml-1m.png' width='25%'><img src='asset/diginetica.png' width='25%'>
 
 ## The Team
 
