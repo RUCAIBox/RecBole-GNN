@@ -59,13 +59,22 @@ We list currently supported models according to category:
 * **[MHCN](recbole_gnn/model/social_recommender/mhcn.py)** from Yu *et al.*: [Self-Supervised Multi-Channel Hypergraph Convolutional Network for Social Recommendation](https://doi.org/10.1145/3442381.3449844) (WWW 2021).
 * **[SEPT](recbole_gnn/model/social_recommender/sept.py)** from Yu *et al.*: [Socially-Aware Self-Supervised Tri-Training for Recommendation](https://doi.org/10.1145/3447548.3467340) (KDD 2021).
 
-## Leaderboard
+## Result
+
+### Leaderboard
 
 We carefully tune the hyper-parameters of the implemented models of each research field and release the corresponding leaderboards for reference:
 
 - **General** recommendation on [`MovieLens-1M`](results/general/ml-1m.md) dataset; 
 - **Sequential** recommendation on [`Diginetica`](results/sequential/diginetica.md) dataset; 
 - **Social** recommendation on [`LastFM`](results/social/lastfm.md) dataset; 
+
+### Efficiency
+
+With the sequential/session graphs preprocessing technique, as well as efficient GNN layers, we speed up the training process of our sequential recommenders a lot.
+
+<img src='asset/ml-1m.png' width='45%'>
+<img src='asset/diginetica.png' width='45%'>
 
 ## The Team
 
