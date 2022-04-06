@@ -1,6 +1,6 @@
 ---
 name: Bug 报告
-about: 提交一份 bug 报告，帮助 RecBole 变得更好
+about: 提交一份 bug 报告，帮助 RecBole-GNN 变得更好
 title: "[\U0001F41BBUG] 用一句话描述您的问题。"
 labels: bug
 assignees: ''
