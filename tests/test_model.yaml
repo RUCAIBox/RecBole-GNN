@@ -1,0 +1,45 @@
+dataset: test
+epochs: 1
+state: ERROR
+data_path: tests/test_data/
+
+# Atomic File Format
+field_separator: "\t"
+seq_separator: " "
+
+# Common Features
+USER_ID_FIELD: user_id
+ITEM_ID_FIELD: item_id
+RATING_FIELD: rating
+TIME_FIELD: timestamp
+seq_len: ~
+# Label for Point-wise DataLoader
+LABEL_FIELD: label
+# NegSample Prefix for Pair-wise DataLoader
+NEG_PREFIX: neg_
+# Sequential Model Needed
+ITEM_LIST_LENGTH_FIELD: item_length
+LIST_SUFFIX: _list
+MAX_ITEM_LIST_LENGTH: 50
+POSITION_FIELD: position_id
+# social network config
+NET_SOURCE_ID_FIELD: source_id
+NET_TARGET_ID_FIELD: target_id
+filter_net_by_inter: True
+undirected_net: True
+
+# Selectively Loading
+load_col:
+    inter: [user_id, item_id, rating, timestamp]
+    net: [source_id, target_id]
+
+unload_col: ~
+
+# Preprocessing
+alias_of_user_id: ~
+alias_of_item_id: ~
+alias_of_entity_id: ~
+alias_of_relation_id: ~
+preload_weight: ~
+normalize_field: ~
+normalize_all: True
