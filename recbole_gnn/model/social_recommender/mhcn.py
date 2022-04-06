@@ -178,25 +178,25 @@ class MHCN(SocialRecommender):
             mixed_embedding = self.attention_layer(user_embeddings_c1, user_embeddings_c2, user_embeddings_c3) + simple_user_embeddings / 2
             
             # Channel S
-            user_embeddings_c1 = self.bipartite_gcn_conv((user_embeddings_c1, user_embeddings_c1), self.H_s_edge_index, self.H_s_edge_weight, size=(self.n_users, self.n_users))
+            user_embeddings_c1 = self.bipartite_gcn_conv((user_embeddings_c1, user_embeddings_c1), self.H_s_edge_index.flip([0]), self.H_s_edge_weight, size=(self.n_users, self.n_users))
             norm_embeddings = F.normalize(user_embeddings_c1, p=2, dim=1)
             all_embeddings_c1 += [norm_embeddings]
 
             # Channel J
-            user_embeddings_c2 = self.bipartite_gcn_conv((user_embeddings_c2, user_embeddings_c2), self.H_j_edge_index, self.H_j_edge_weight, size=(self.n_users, self.n_users))
+            user_embeddings_c2 = self.bipartite_gcn_conv((user_embeddings_c2, user_embeddings_c2), self.H_j_edge_index.flip([0]), self.H_j_edge_weight, size=(self.n_users, self.n_users))
             norm_embeddings = F.normalize(user_embeddings_c2, p=2, dim=1)
             all_embeddings_c2 += [norm_embeddings]
 
             # Channel P
-            user_embeddings_c3 = self.bipartite_gcn_conv((user_embeddings_c3, user_embeddings_c3), self.H_p_edge_index, self.H_p_edge_weight, size=(self.n_users, self.n_users))
+            user_embeddings_c3 = self.bipartite_gcn_conv((user_embeddings_c3, user_embeddings_c3), self.H_p_edge_index.flip([0]), self.H_p_edge_weight, size=(self.n_users, self.n_users))
             norm_embeddings = F.normalize(user_embeddings_c3, p=2, dim=1)
             all_embeddings_c3 += [norm_embeddings]
 
             # item convolution
-            new_item_embeddings = self.bipartite_gcn_conv((mixed_embedding, item_embeddings), self.R_item_edge_index, self.R_item_edge_weight, size=(self.n_users, self.n_items))
+            new_item_embeddings = self.bipartite_gcn_conv((mixed_embedding, item_embeddings), self.R_item_edge_index.flip([0]), self.R_item_edge_weight, size=(self.n_users, self.n_items))
             norm_embeddings = F.normalize(new_item_embeddings, p=2, dim=1)
             all_embeddings_i += [norm_embeddings]
-            simple_user_embeddings = self.bipartite_gcn_conv((item_embeddings, simple_user_embeddings), self.R_user_edge_index, self.R_user_edge_weight, size=(self.n_items, self.n_users))
+            simple_user_embeddings = self.bipartite_gcn_conv((item_embeddings, simple_user_embeddings), self.R_user_edge_index.flip([0]), self.R_user_edge_weight, size=(self.n_items, self.n_users))
             norm_embeddings = F.normalize(simple_user_embeddings, p=2, dim=1)
             all_embeddings_simple += [norm_embeddings]
             item_embeddings = new_item_embeddings
@@ -227,7 +227,7 @@ class MHCN(SocialRecommender):
 
         # For Douban, normalization is needed.
         # user_embeddings = F.normalize(user_embeddings, p=2, dim=1) 
-        edge_embeddings = self.bipartite_gcn_conv((user_embeddings, user_embeddings), edge_index, edge_weight, size=(self.n_users, self.n_users))
+        edge_embeddings = self.bipartite_gcn_conv((user_embeddings, user_embeddings), edge_index.flip([0]), edge_weight, size=(self.n_users, self.n_users))
         # Local MIM
         pos = score(user_embeddings, edge_embeddings)
         neg1 = score(row_shuffle(user_embeddings), edge_embeddings)
