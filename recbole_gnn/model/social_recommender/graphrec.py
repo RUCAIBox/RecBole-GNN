@@ -49,7 +49,7 @@ class UIAggregator(MessagePassing):
     r"""UIAggregator is to capture interactions and opinions in the user-item graph.
     """
     def __init__(self, opinion_emb, emb_dim):
-        super().__init__(aggr='add', flow='target_to_source')
+        super().__init__(aggr='add')
         self.opinion_emb = opinion_emb
         self.ln1 = nn.Linear(emb_dim * 2, emb_dim)
         self.ln2 = nn.Linear(emb_dim, emb_dim)
@@ -178,7 +178,7 @@ class GraphRec(SocialRecommender):
         all_embeddings = torch.cat([user_embeddings, item_embeddings], dim=0)
 
         # Item Aggregation in User Modeling
-        user_ui_embeddings = self.u_aggregator((item_embeddings, user_embeddings), self.user_edge_index, self.edge_attr, (self.n_items, self.n_users))
+        user_ui_embeddings = self.u_aggregator((item_embeddings, user_embeddings), self.user_edge_index.flip([0]), self.edge_attr, (self.n_items, self.n_users))
         user_ui_embeddings = self.activation(self.u_agg_linear(torch.cat([user_embeddings, user_ui_embeddings], dim=1)))
 
         # Social Aggregation in User Modeling
@@ -188,7 +188,7 @@ class GraphRec(SocialRecommender):
         user_all_embeddings = self.activation(self.social_agg_linear(torch.cat([user_ui_embeddings, user_social_embeddings], dim=1)))
 
         # User Aggregation in Item Modeling
-        item_all_embeddings = self.i_aggregator((user_embeddings, item_embeddings), self.item_edge_index, self.edge_attr, (self.n_users, self.n_items))
+        item_all_embeddings = self.i_aggregator((user_embeddings, item_embeddings), self.item_edge_index.flip([0]), self.edge_attr, (self.n_users, self.n_items))
         item_all_embeddings = self.activation(self.i_agg_linear(torch.cat([item_embeddings, item_all_embeddings], dim=1)))
 
         return user_all_embeddings, item_all_embeddings

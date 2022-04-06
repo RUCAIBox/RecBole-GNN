@@ -94,11 +94,11 @@ class DiffNet(SocialRecommender):
             user_embedding = user_embedding + user_review_vector_matrix
             final_item_embedding = final_item_embedding + item_review_vector_matrix
 
-        user_embedding_from_consumed_items = self.bipartite_gcn_conv(x=(final_item_embedding, user_embedding), edge_index=self.edge_index, edge_weight=self.edge_weight, size=(self.n_items, self.n_users))
+        user_embedding_from_consumed_items = self.bipartite_gcn_conv(x=(final_item_embedding, user_embedding), edge_index=self.edge_index.flip([0]), edge_weight=self.edge_weight, size=(self.n_items, self.n_users))
 
         embeddings_list = [user_embedding]
         for layer_idx in range(self.n_layers):
-            user_embedding = self.bipartite_gcn_conv((user_embedding, user_embedding), self.net_edge_index, self.net_edge_weight, size=(self.n_users, self.n_users))
+            user_embedding = self.bipartite_gcn_conv((user_embedding, user_embedding), self.net_edge_index.flip([0]), self.net_edge_weight, size=(self.n_users, self.n_users))
             embeddings_list.append(user_embedding)
         final_user_embedding = torch.stack(embeddings_list, dim=1)
         final_user_embedding = torch.sum(final_user_embedding, dim=1) + user_embedding_from_consumed_items

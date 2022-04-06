@@ -22,7 +22,7 @@ class LightGCNConv(MessagePassing):
 
 class BipartiteGCNConv(MessagePassing):
     def __init__(self, dim):
-        super(BipartiteGCNConv, self).__init__(aggr='add', flow='target_to_source')
+        super(BipartiteGCNConv, self).__init__(aggr='add')
         self.dim = dim
 
     def forward(self, x, edge_index, edge_weight, size):
