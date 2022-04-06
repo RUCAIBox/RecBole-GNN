@@ -1,5 +1,6 @@
 import os
 from recbole.config.configurator import Config as RecBole_Config
+from recbole.utils import ModelType as RecBoleModelType
 
 from recbole_gnn.utils import get_model, ModelType
 
@@ -52,11 +53,14 @@ class Config(RecBole_Config):
         current_path = os.path.dirname(os.path.realpath(__file__))
         model_init_file = os.path.join(current_path, './properties/model/' + model + '.yaml')
         quick_start_config_path = os.path.join(current_path, './properties/quick_start_config/')
+        sequential_base_init = os.path.join(quick_start_config_path, 'sequential_base.yaml')
         social_base_init = os.path.join(quick_start_config_path, 'social_base.yaml')
 
         if os.path.isfile(model_init_file):
             config_dict = self._update_internal_config_dict(model_init_file)
 
         self.internal_config_dict['MODEL_TYPE'] = model_class.type
+        if self.internal_config_dict['MODEL_TYPE'] == RecBoleModelType.SEQUENTIAL:
+            self._update_internal_config_dict(sequential_base_init)
         if self.internal_config_dict['MODEL_TYPE'] == ModelType.SOCIAL:
             self._update_internal_config_dict(social_base_init)
