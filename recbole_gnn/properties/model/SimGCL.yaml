@@ -1,0 +1,7 @@
+embedding_size: 64
+n_layers: 2
+reg_weight: 1e-4
+
+lambda: 0.5
+eps: 0.1
+temperature: 0.2
