@@ -55,6 +55,12 @@ class TestGeneralRecommender(unittest.TestCase):
         }
         quick_test(config_dict)
 
+    def test_simgcl(self):
+        config_dict = {
+            'model': 'SimGCL'
+        }
+        quick_test(config_dict)
+
 
 class TestSequentialRecommender(unittest.TestCase):
     def test_gru4rec(self):
