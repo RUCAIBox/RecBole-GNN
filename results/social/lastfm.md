@@ -2,6 +2,8 @@
 
 **Dataset:** [LastFM](http://files.grouplens.org/datasets/hetrec2011/)
 
+> Note that datasets for social recommendation methods can be downloaded from [Social-Datasets](https://github.com/Sherry-XLL/Social-Datasets).
+
 **Filtering:** None
 
 **Evaluation:** ratio-based 8:1:1, full sort
