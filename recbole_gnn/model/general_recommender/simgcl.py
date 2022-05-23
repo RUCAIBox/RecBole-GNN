@@ -48,8 +48,8 @@ class SimGCL(LightGCN):
     def calculate_loss(self, interaction):
         loss = super().calculate_loss(interaction)
 
-        user = interaction[self.USER_ID]
-        pos_item = interaction[self.ITEM_ID]
+        user = torch.unique(interaction[self.USER_ID])
+        pos_item = torch.unique(interaction[self.ITEM_ID])
 
         perturbed_user_embs_1, perturbed_item_embs_1 = self.forward(perturbed=True)
         perturbed_user_embs_2, perturbed_item_embs_2 = self.forward(perturbed=True)
