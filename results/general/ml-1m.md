@@ -55,7 +55,7 @@ embedding_size: 64
 | **SGL**              | 0.1889    | 0.4315 | 0.2505  | 0.7392 | 0.1843       |
 | **HMLET**            | 0.1847    | 0.4297 | 0.2490  | 0.7305 | 0.1836       |
 | **NCL**              | 0.2021    | 0.4599 | 0.2702  | 0.7565 | 0.1962       |
-| **SimGCL**           | 0.2037    | 0.4547 | 0.2666  | 0.7632 | 0.1927       |
+| **SimGCL**           | 0.2029    | 0.4550 | 0.2667  | 0.7640 | 0.1933       |
 
 # Hyper-parameters
 
@@ -68,4 +68,4 @@ embedding_size: 64
 | **SGL**      | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001<br />ssl_tau=0.5<br />drop_ratio=0.1<br />ssl_weight=0.005 | learning_rate choice [0.002]<br/>n_layers choice [3]<br/>reg_weight choice [1e-4]<br/>ssl_tau choice [0.1, 0.5]<br/>drop_ratio choice [0.1, 0.3]<br/>ssl_weight choice [1e-5, 1e-6, 1e-7, 0.005, 0.01, 0.05] |
 | **HMLET**    | learning_rate=0.002<br />n_layers=4<br />activation_function=leakyrelu | learning_rate choice [0.002, 0.001, 0.0005]<br/>n_layers choice [3, 4]<br/>activation_function choice ['elu', 'leakyrelu'] |
 | **NCL**      | learning_rate=0.002<br />n_layers=3<br />reg_weight=0.0001<br />ssl_temp=0.1<br />ssl_reg=1e-06<br />hyper_layers=1<br />alpha=1.5 | learning_rate choice [0.002]<br/>n_layers choice [3]<br/>reg_weight choice [1e-4]<br/>ssl_temp choice [0.1, 0.05]<br/>ssl_reg choice [1e-7, 1e-6]<br/>hyper_layers choice [1]<br/>alpha choice [1, 0.8, 1.5] |
-| **SimGCL**      | learning_rate=0.002<br />n_layers=2<br />reg_weight=0.0001<br />temperature=0.05<br />lambda=1e-5<br />eps=0.2 | learning_rate choice [0.002]<br/>n_layers choice [2, 3]<br/>reg_weight choice [1e-4]<br/>temperature choice [0.05, 0.1, 0.2]<br/>lambda choice [1e-5, 1e-6, 1e-7, 0.005, 0.01, 0.05]<br/>eps choice [0.1, 0.2] |
+| **SimGCL**      | learning_rate=0.002<br />n_layers=2<br />reg_weight=0.0001<br />temperature=0.05<br />lambda=1e-5<br />eps=0.1 | learning_rate choice [0.002]<br/>n_layers choice [2, 3]<br/>reg_weight choice [1e-4]<br/>temperature choice [0.05, 0.1, 0.2]<br/>lambda choice [1e-5, 1e-6, 1e-7, 0.005, 0.01, 0.05]<br/>eps choice [0.1, 0.2] |
