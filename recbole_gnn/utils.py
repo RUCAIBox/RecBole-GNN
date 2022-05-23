@@ -10,7 +10,7 @@ from recbole.utils import get_model as get_recbole_model
 from recbole.utils import get_trainer as get_recbole_trainer
 from recbole.utils.argument_list import dataset_arguments
 
-from recbole_gnn.data.dataloader import CustomizedTrainDataLoader, CustomizedFullSortEvalDataLoader
+from recbole_gnn.data.dataloader import CustomizedTrainDataLoader, CustomizedNegSampleEvalDataLoader, CustomizedFullSortEvalDataLoader
 
 
 def create_dataset(config):
@@ -91,7 +91,7 @@ def _get_customized_dataloader(config, phase):
     else:
         eval_strategy = config['eval_neg_sample_args']['strategy']
         if eval_strategy in {'none', 'by'}:
-            raise NotImplementedError('CustomizedTrainDataLoader doesn\'t support negative sampling currently.')
+            return CustomizedNegSampleEvalDataLoader
         elif eval_strategy == 'full':
             return CustomizedFullSortEvalDataLoader
 
