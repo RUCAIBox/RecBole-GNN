@@ -87,6 +87,17 @@ class TestSequentialRecommender(unittest.TestCase):
         }
         quick_test(config_dict)
 
+    def test_srgnn_uni100(self):
+        config_dict = {
+            'model': 'SRGNN',
+            'eval_args': {
+                'split': {'LS': "valid_and_test"},
+                'mode': 'uni100',
+                'order': 'TO'
+            }
+        }
+        quick_test(config_dict)
+
     def test_gcsan(self):
         config_dict = {
             'model': 'GCSAN',
