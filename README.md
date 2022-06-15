@@ -80,9 +80,9 @@ We list currently supported models according to category:
 
 We carefully tune the hyper-parameters of the implemented models of each research field and release the corresponding leaderboards for reference:
 
-- **General** recommendation on [`MovieLens-1M`](results/general/ml-1m.md) dataset; 
-- **Sequential** recommendation on [`Diginetica`](results/sequential/diginetica.md) dataset; 
-- **Social** recommendation on [`LastFM`](results/social/lastfm.md) dataset; 
+- **General** recommendation on `MovieLens-1M` dataset [[link]](results/general/ml-1m.md);
+- **Sequential** recommendation on `Diginetica` dataset [[link]](results/sequential/diginetica.md);
+- **Social** recommendation on `LastFM` dataset [[link]](results/social/lastfm.md);
 
 ### Efficiency
 
