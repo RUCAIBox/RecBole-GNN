@@ -106,7 +106,7 @@ class MultiBehaviorDataset(SessionGraphDataset):
     def session_graph_construction(self):
         self.logger.info('Constructing multi-behavior session graphs.')
         self.item_behavior_list_field = self.config['ITEM_BEHAVIOR_LIST_FIELD']
-        self.behavior_id_field = self.config['Behavior_ID_FIELD']
+        self.behavior_id_field = self.config['BEHAVIOR_ID_FIELD']
         item_seq = self.inter_feat[self.item_id_list_field]
         item_seq_len = self.inter_feat[self.item_list_length_field]
         if self.item_behavior_list_field == None or self.behavior_id_field:
