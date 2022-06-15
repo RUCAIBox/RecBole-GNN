@@ -104,14 +104,16 @@ class SessionGraphDataset(SequentialDataset):
 class MultiBehaviorDataset(SessionGraphDataset):
 
     def session_graph_construction(self):
-        self.logger.info('Constructing Multi-behavior session graphs.')
+        self.logger.info('Constructing multi-behavior session graphs.')
         self.item_behavior_list_field = self.config['ITEM_BEHAVIOR_LIST_FIELD']
+        self.behavior_id_field = self.config['Behavior_ID_FIELD']
         item_seq = self.inter_feat[self.item_id_list_field]
         item_seq_len = self.inter_feat[self.item_list_length_field]
-        if self.item_behavior_list_field == None:
+        if self.item_behavior_list_field == None or self.behavior_id_field:
             # To be compatible with existing datasets
             item_behavior_seq = torch.tensor([0] * len(item_seq))
-            self.field2id_token['behavior_id'] = {0:'interaction'}
+            self.behavior_id_field = 'behavior_id'
+            self.field2id_token[self.behavior_id_field] = {0:'interaction'}
         else:
             item_behavior_seq = self.inter_feat[self.item_list_length_field]
 
@@ -140,7 +142,7 @@ class MultiBehaviorDataset(SessionGraphDataset):
 
         nx = {}
         for k, v in x.items():
-            behavior_name = self.id2token('behavior_id', k)
+            behavior_name = self.id2token(self.behavior_id_field, k)
             nx[behavior_name] = v
 
         self.inter_feat.interaction['graph_idx'] = torch.arange(item_seq.shape[0])
