@@ -109,7 +109,7 @@ class MultiBehaviorDataset(SessionGraphDataset):
         self.behavior_id_field = self.config['BEHAVIOR_ID_FIELD']
         item_seq = self.inter_feat[self.item_id_list_field]
         item_seq_len = self.inter_feat[self.item_list_length_field]
-        if self.item_behavior_list_field == None or self.behavior_id_field:
+        if self.item_behavior_list_field == None or self.behavior_id_field == None:
             # To be compatible with existing datasets
             item_behavior_seq = torch.tensor([0] * len(item_seq))
             self.behavior_id_field = 'behavior_id'
