@@ -101,6 +101,56 @@ class SessionGraphDataset(SequentialDataset):
             dataset.session_graph_construction()
         return datasets
 
+class MultiBehaviorDataset(SessionGraphDataset):
+
+    def session_graph_construction(self):
+        self.logger.info('Constructing multi-behavior session graphs.')
+        self.item_behavior_list_field = self.config['ITEM_BEHAVIOR_LIST_FIELD']
+        self.behavior_id_field = self.config['BEHAVIOR_ID_FIELD']
+        item_seq = self.inter_feat[self.item_id_list_field]
+        item_seq_len = self.inter_feat[self.item_list_length_field]
+        if self.item_behavior_list_field == None or self.behavior_id_field == None:
+            # To be compatible with existing datasets
+            item_behavior_seq = torch.tensor([0] * len(item_seq))
+            self.behavior_id_field = 'behavior_id'
+            self.field2id_token[self.behavior_id_field] = {0:'interaction'}
+        else:
+            item_behavior_seq = self.inter_feat[self.item_list_length_field]
+
+        edge_index = []
+        alias_inputs = []
+        behaviors = torch.unique(item_behavior_seq)
+        x = {}
+        for behavior in behaviors:
+            x[behavior.item()] = []
+
+        behavior_seqs = list(torch.chunk(item_behavior_seq, item_seq.shape[0]))
+        for i, seq in enumerate(tqdm(list(torch.chunk(item_seq, item_seq.shape[0])))):
+            bseq = behavior_seqs[i]
+            for behavior in behaviors:
+                bidx = torch.where(bseq == behavior)
+                subseq = torch.index_select(seq, 0, bidx[0])
+                subseq, _ = torch.unique(subseq, return_inverse=True)
+                x[behavior.item()].append(subseq)
+
+            seq, idx = torch.unique(seq, return_inverse=True)
+            alias_seq = idx.squeeze(0)[:item_seq_len[i]]
+            alias_inputs.append(alias_seq)
+            # No repeat click
+            edge = torch.stack([alias_seq[:-1], alias_seq[1:]]).unique(dim=-1)
+            edge_index.append(edge)
+
+        nx = {}
+        for k, v in x.items():
+            behavior_name = self.id2token(self.behavior_id_field, k)
+            nx[behavior_name] = v
+
+        self.inter_feat.interaction['graph_idx'] = torch.arange(item_seq.shape[0])
+        self.graph_objs = {
+            'x': nx,
+            'edge_index': edge_index,
+            'alias_inputs': alias_inputs
+        }
 
 class LESSRDataset(SessionGraphDataset):
     def session_graph_construction(self):
