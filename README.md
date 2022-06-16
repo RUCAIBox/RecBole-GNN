@@ -96,14 +96,24 @@ RecBole-GNN is developed and maintained by members from [RUCAIBox](http://aibox.
 
 ## Acknowledgement
 
-The implementation is based on the open-source recommendation library [RecBole](https://github.com/RUCAIBox/RecBole).
+The implementation is based on the open-source recommendation library [RecBole](https://github.com/RUCAIBox/RecBole). RecBole-GNN is part of [RecBole 2.0](https://github.com/RUCAIBox/RecBole2.0) now!
 
 Please cite the following paper as the reference if you use our code or processed datasets.
 
-```
-@inproceedings{zhao2021recbole,
-  title={Recbole: Towards a unified, comprehensive and efficient framework for recommendation algorithms},
-  author={Wayne Xin Zhao and Shanlei Mu and Yupeng Hou and Zihan Lin and Kaiyuan Li and Yushuo Chen and Yujie Lu and Hui Wang and Changxin Tian and Xingyu Pan and Yingqian Min and Zhichao Feng and Xinyan Fan and Xu Chen and Pengfei Wang and Wendi Ji and Yaliang Li and Xiaoling Wang and Ji-Rong Wen},
-  booktitle={{CIKM}},
-  year={2021}
+```bibtex
+@article{zhao2022recbole2,
+  author={Wayne Xin Zhao and Yupeng Hou and Xingyu Pan and Chen Yang and Zeyu Zhang and Zihan Lin and Jingsen Zhang and Shuqing Bian and Jiakai Tang and Wenqi Sun and Yushuo Chen and Lanling Xu and Gaowei Zhang and Zhen Tian and Changxin Tian and Shanlei Mu and Xinyan Fan and Xu Chen and Ji-Rong Wen},
+  title={RecBole 2.0: Towards a More Up-to-Date Recommendation Library},
+  journal={arXiv preprint arXiv:2206.07351},
+  year={2022}
 }
+
+@inproceedings{zhao2021recbole,
+  author    = {Wayne Xin Zhao and Shanlei Mu and Yupeng Hou and Zihan Lin and Yushuo Chen and Xingyu Pan and Kaiyuan Li and Yujie Lu and Hui Wang and Changxin Tian and  Yingqian Min and Zhichao Feng and Xinyan Fan and Xu Chen and Pengfei Wang and Wendi Ji and Yaliang Li and Xiaoling Wang and Ji{-}Rong Wen},
+  title     = {RecBole: Towards a Unified, Comprehensive and Efficient Framework for Recommendation Algorithms},
+  booktitle = {{CIKM}},
+  pages     = {4653--4664},
+  publisher = {{ACM}},
+  year      = {2021}
+}
+```
