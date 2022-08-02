@@ -101,10 +101,10 @@ The implementation is based on the open-source recommendation library [RecBole](
 Please cite the following paper as the reference if you use our code or processed datasets.
 
 ```bibtex
-@article{zhao2022recbole2,
+@inproceedings{zhao2022recbole2,
   author={Wayne Xin Zhao and Yupeng Hou and Xingyu Pan and Chen Yang and Zeyu Zhang and Zihan Lin and Jingsen Zhang and Shuqing Bian and Jiakai Tang and Wenqi Sun and Yushuo Chen and Lanling Xu and Gaowei Zhang and Zhen Tian and Changxin Tian and Shanlei Mu and Xinyan Fan and Xu Chen and Ji-Rong Wen},
   title={RecBole 2.0: Towards a More Up-to-Date Recommendation Library},
-  journal={arXiv preprint arXiv:2206.07351},
+  booktitle = {{CIKM}},
   year={2022}
 }
 
