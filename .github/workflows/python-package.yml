@@ -40,8 +40,7 @@ jobs:
         pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install recbole==1.0.1
         conda list
-        conda install -c conda-forge faiss-cpu
-        pip install libstdcxx-ng==12.1.0
+        conda install -c conda-forge faiss-cpu libstdcxx-ng==12.1.0
         pip install setuptools==59.5.0
     # Use "python -m pytest" instead of "pytest" to fix imports
     - name: Test model
