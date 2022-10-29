@@ -42,7 +42,6 @@ jobs:
         conda list
         conda install -c conda-forge faiss-cpu
         conda install -c conda-forge libstdcxx-ng
-        find / -name "libstdc++.so*"
         sudo rm /usr/lib/x86_64-linux-gnu/libstdc++.so.6
         sudo ln -s /home/runner/conda_pkgs_dir/libstdcxx-ng-12.2.0-h46fd767_19/lib/libstdc++.so.6.0.30 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
         pip install setuptools==59.5.0
