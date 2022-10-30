@@ -11,4 +11,4 @@ step: 1
 weight: 0.6
 reg_weight: 5e-5
 loss_type: 'CE'
-transform: sess_graph
+gnn_transform: sess_graph

@@ -23,11 +23,13 @@
 ## Requirements
 
 ```
-recbole==1.0.1
+recbole==1.1.1
 pyg>=2.0.4
 pytorch>=1.7.0
 python>=3.7.0
 ```
+
+> If you are using `recbole==1.0.1`, please refer to our `recbole1.0.1` branch.
 
 ## Quick-Start
 

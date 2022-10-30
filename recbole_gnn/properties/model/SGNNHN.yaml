@@ -2,4 +2,4 @@ embedding_size: 64
 step: 6
 scale: 12
 loss_type: 'CE'
-transform: sess_graph
+gnn_transform: sess_graph

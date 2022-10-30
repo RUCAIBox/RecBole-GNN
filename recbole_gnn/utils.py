@@ -89,11 +89,11 @@ def _get_customized_dataloader(config, phase):
     if phase == 'train':
         return CustomizedTrainDataLoader
     else:
-        eval_strategy = config['eval_neg_sample_args']['strategy']
-        if eval_strategy in {'none', 'by'}:
-            return CustomizedNegSampleEvalDataLoader
-        elif eval_strategy == 'full':
+        eval_mode = config["eval_args"]["mode"]
+        if eval_mode == 'full':
             return CustomizedFullSortEvalDataLoader
+        else:
+            return CustomizedNegSampleEvalDataLoader
 
 
 def data_preparation(config, dataset):
@@ -130,7 +130,7 @@ def data_preparation(config, dataset):
         logger.info(
             set_color('[Training]: ', 'pink') + set_color('train_batch_size', 'cyan') + ' = ' +
             set_color(f'[{config["train_batch_size"]}]', 'yellow') + set_color(' negative sampling', 'cyan') + ': ' +
-            set_color(f'[{config["neg_sampling"]}]', 'yellow')
+            set_color(f'[{config["train_neg_sample_args"]}]', 'yellow')
         )
         logger.info(
             set_color('[Evaluation]: ', 'pink') + set_color('eval_batch_size', 'cyan') + ' = ' +

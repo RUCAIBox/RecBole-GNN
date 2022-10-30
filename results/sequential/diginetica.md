@@ -36,7 +36,7 @@ eval_args:
   split: {'LS':"valid_and_test"}
   mode: full
   order: TO
-neg_sampling: ~
+train_neg_sample_args: ~
 ```
 
 For fairness, we restrict users' and items' embedding dimension as following. Please adjust the name of the corresponding args of different models.
