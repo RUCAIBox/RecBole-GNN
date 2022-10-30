@@ -38,7 +38,7 @@ jobs:
         pip install dgl
         pip install torch==${{ matrix.torch-version}}+cpu -f https://download.pytorch.org/whl/torch_stable.html
         pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-        pip install recbole==1.0.1
+        pip install recbole==1.1.1
         conda list
         conda install -c conda-forge faiss-cpu
         conda install -c conda-forge libstdcxx-ng
