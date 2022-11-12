@@ -92,7 +92,7 @@ class SEPT(SocialRecommender):
         # Friend View: A_f = (SS) ⊙ S
         social_mat = dataset.net_matrix()
         social_matrix = social_mat.dot(social_mat)
-        social_matrix =  social_matrix * social_mat + eye(self.n_users)
+        social_matrix =  social_matrix.toarray() * social_mat.toarray() + eye(self.n_users)
         social_matrix = coo_matrix(social_matrix)
         social_edge_index = torch.stack([torch.LongTensor(social_matrix.row), torch.LongTensor(social_matrix.col)])
         social_edge_weight = self.get_norm_edge_weight(social_edge_index, self.n_users)
@@ -100,7 +100,7 @@ class SEPT(SocialRecommender):
         # Sharing View: A_s = (RR^T) ⊙ S
         rating_mat = dataset.inter_matrix()
         sharing_matrix = rating_mat.dot(rating_mat.T)
-        sharing_matrix = sharing_matrix * social_mat + eye(self.n_users)
+        sharing_matrix = sharing_matrix.toarray() * social_mat.toarray() + eye(self.n_users)
         sharing_matrix = coo_matrix(sharing_matrix)
         sharing_edge_index = torch.stack([torch.LongTensor(sharing_matrix.row), torch.LongTensor(sharing_matrix.col)])
         sharing_edge_weight = self.get_norm_edge_weight(sharing_edge_index, self.n_users)
