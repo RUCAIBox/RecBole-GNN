@@ -35,9 +35,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest
-        pip install dgl
+        pip install dgl==0.9.1
         pip install torch==${{ matrix.torch-version}}+cpu -f https://download.pytorch.org/whl/torch_stable.html
-        pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
+        pip install torch-scatter==2.0.9 torch-sparse==0.6.15 torch-cluster==1.6.0 torch-spline-conv==1.2.1 torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install recbole==1.1.1
         conda list
         conda install -c conda-forge faiss-cpu
