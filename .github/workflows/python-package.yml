@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.9]
-        torch-version: [1.11.0]
+        torch-version: [2.0.0]
     defaults:
       run:
         shell: bash -l {0}
@@ -39,12 +39,7 @@ jobs:
         pip install torch==${{ matrix.torch-version}}+cpu -f https://download.pytorch.org/whl/torch_stable.html
         pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install recbole==1.1.1
-        conda list
         conda install -c conda-forge faiss-cpu
-        conda install -c conda-forge libstdcxx-ng
-        sudo rm /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-        sudo ln -s /home/linuxbrew/.linuxbrew/Cellar/gcc/12.2.0/lib/gcc/12/libstdc++.so.6.0.30 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-        pip install setuptools==59.5.0
     # Use "python -m pytest" instead of "pytest" to fix imports
     - name: Test model
       run: |
