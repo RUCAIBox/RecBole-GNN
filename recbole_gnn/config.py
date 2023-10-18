@@ -1,4 +1,5 @@
 import os
+import recbole
 from recbole.config.configurator import Config as RecBole_Config
 from recbole.utils import ModelType as RecBoleModelType
 
@@ -16,7 +17,8 @@ class Config(RecBole_Config):
             config_file_list (list of str): the external config file, it allows multiple config files, default is None.
             config_dict (dict): the external parameter dictionaries, default is None.
         """
-        self.compatibility_settings()
+        if recbole.__version__ == "1.1.1":
+            self.compatibility_settings()
         super(Config, self).__init__(model, dataset, config_file_list, config_dict)
 
     def compatibility_settings(self):
@@ -59,7 +61,7 @@ class Config(RecBole_Config):
             final_dataset = dataset
 
         return final_model, final_model_class, final_dataset
-    
+
     def _load_internal_config_dict(self, model, model_class, dataset):
         super()._load_internal_config_dict(model, model_class, dataset)
         current_path = os.path.dirname(os.path.realpath(__file__))
