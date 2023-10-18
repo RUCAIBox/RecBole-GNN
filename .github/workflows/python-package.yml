@@ -37,17 +37,9 @@ jobs:
         pip install pytest
         pip install dgl
         pip install torch==${{ matrix.torch-version}}+cpu -f https://download.pytorch.org/whl/torch_stable.html
-        pip install torch_geometric
-        pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-        # pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
+        pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install recbole==1.1.1
-        conda list
         conda install -c conda-forge faiss-cpu
-        pip install numpy==1.19
-        # conda install -c conda-forge libstdcxx-ng
-        # sudo rm /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-        # sudo ln -s /home/linuxbrew/.linuxbrew/Cellar/gcc/12.2.0/lib/gcc/12/libstdc++.so.6.0.30 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-        # pip install setuptools==59.5.0
     # Use "python -m pytest" instead of "pytest" to fix imports
     - name: Test model
       run: |
