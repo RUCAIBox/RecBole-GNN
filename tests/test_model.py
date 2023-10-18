@@ -60,6 +60,12 @@ class TestGeneralRecommender(unittest.TestCase):
             'model': 'SimGCL'
         }
         quick_test(config_dict)
+        
+    def test_xsimgcl(self):
+        config_dict = {
+            'model': 'XSimGCL'
+        }
+        quick_test(config_dict)
 
     def test_lightgcl(self):
         config_dict = {
