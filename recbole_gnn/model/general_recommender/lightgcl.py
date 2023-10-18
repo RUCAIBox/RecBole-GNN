@@ -113,7 +113,7 @@ class LightGCL(GeneralRecommender):
             np.vstack((matrix.row, matrix.col)).astype(np.int64))
         values = torch.from_numpy(matrix.data)
         shape = torch.Size(matrix.shape)
-        x = torch.sparse.FloatTensor(indices, values, shape).coalesce().cuda(torch.device(self.device))
+        x = torch.sparse.FloatTensor(indices, values, shape).coalesce().to(self.device)
         return x
 
     def sparse_dropout(self, matrix, dropout):
