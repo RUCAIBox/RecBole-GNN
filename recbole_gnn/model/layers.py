@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch_geometric.nn import MessagePassing
-from torch_geometric.utils import add_self_loops
+from torch_sparse import matmul
 
 
 class LightGCNConv(MessagePassing):
@@ -15,6 +15,9 @@ class LightGCNConv(MessagePassing):
 
     def message(self, x_j, edge_weight):
         return edge_weight.view(-1, 1) * x_j
+
+    def message_and_aggregate(self, adj_t, x):
+        return matmul(adj_t, x, reduce=self.aggr)
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, self.dim)
@@ -41,6 +44,7 @@ class BiGNNConv(MessagePassing):
     .. math::
         output = (L+I)EW_1 + LE \otimes EW_2
     """
+
     def __init__(self, in_channels, out_channels):
         super().__init__(aggr='add')
         self.in_channels, self.out_channels = in_channels, out_channels
@@ -55,6 +59,9 @@ class BiGNNConv(MessagePassing):
 
     def message(self, x_j, edge_weight):
         return edge_weight.view(-1, 1) * x_j
+
+    def message_and_aggregate(self, adj_t, x):
+        return matmul(adj_t, x, reduce=self.aggr)
 
     def __repr__(self):
         return '{}({},{})'.format(self.__class__.__name__, self.in_channels, self.out_channels)

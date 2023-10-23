@@ -18,6 +18,10 @@ def run_recbole_gnn(model=None, dataset=None, config_file_list=None, config_dict
     """
     # configurations initialization
     config = Config(model=model, dataset=dataset, config_file_list=config_file_list, config_dict=config_dict)
+    try:
+        assert config["enable_sparse"] in [True, False, None]
+    except AssertionError:
+        raise ValueError("Your config `enable_sparse` must be `True` or `False` or `None`")
     init_seed(config['seed'], config['reproducibility'])
     # logger initialization
     init_logger(config)
@@ -69,6 +73,10 @@ def objective_function(config_dict=None, config_file_list=None, saved=True):
     """
 
     config = Config(config_dict=config_dict, config_file_list=config_file_list)
+    try:
+        assert config["enable_sparse"] in [True, False, None]
+    except AssertionError:
+        raise ValueError("Your config `enable_sparse` must be `True` or `False` or `None`")
     init_seed(config['seed'], config['reproducibility'])
     logging.basicConfig(level=logging.ERROR)
     dataset = create_dataset(config)

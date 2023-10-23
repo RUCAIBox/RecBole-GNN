@@ -16,6 +16,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch_geometric.utils import degree
+from torch_geometric.nn.conv.gcn_conv import gcn_norm
 
 from recbole.model.init import xavier_uniform_initialization
 from recbole.model.loss import EmbLoss
@@ -53,6 +54,7 @@ class SGL(GeneralGraphRecommender):
 
         self._user = dataset.inter_feat[dataset.uid_field]
         self._item = dataset.inter_feat[dataset.iid_field]
+        self.dataset = dataset
 
         # define layers and loss
         self.user_embedding = torch.nn.Embedding(self.n_users, self.latent_dim)
@@ -111,10 +113,15 @@ class SGL(GeneralGraphRecommender):
         edge_index1 = torch.stack([row, col])
         edge_index2 = torch.stack([col, row])
         edge_index = torch.cat([edge_index1, edge_index2], dim=1)
+        edge_weight = torch.ones(edge_index.size(1))
+        num_nodes = self.n_users + self.n_items
 
-        deg = degree(edge_index[0], self.n_users + self.n_items)
-        norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
-        edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
+        if self.use_sparse:
+            adj_t = self.dataset.edge_index_to_adj_t(edge_index, edge_weight, num_nodes, num_nodes)
+            adj_t = gcn_norm(adj_t, None, num_nodes, add_self_loops=False)
+            return adj_t.to(self.device), None
+
+        edge_index, edge_weight = gcn_norm(edge_index, edge_weight, num_nodes, add_self_loops=False)
 
         return edge_index.to(self.device), edge_weight.to(self.device)
 
