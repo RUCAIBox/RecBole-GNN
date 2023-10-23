@@ -22,7 +22,7 @@ from recbole_gnn.model.abstract_recommender import GeneralGraphRecommender
 
 
 class DirectAU(GeneralGraphRecommender):
-    input_type = InputType.POINTWISE
+    input_type = InputType.PAIRWISE
 
     def __init__(self, config, dataset):
         super(DirectAU, self).__init__(config, dataset)
