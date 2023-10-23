@@ -16,10 +16,27 @@ from recbole.data.dataset import SequentialDataset
 from recbole.data.dataset import Dataset as RecBoleDataset
 from recbole.utils import set_color, FeatureSource
 
+import recbole
+import pickle
+from recbole.utils import ensure_dir
+
 
 class GeneralGraphDataset(RecBoleDataset):
     def __init__(self, config):
         super().__init__(config)
+
+    if recbole.__version__ == "1.1.1":
+
+        def save(self):
+            """Saving this :class:`Dataset` object to :attr:`config['checkpoint_dir']`."""
+            save_dir = self.config["checkpoint_dir"]
+            ensure_dir(save_dir)
+            file = os.path.join(save_dir, f'{self.config["dataset"]}-{self.__class__.__name__}.pth')
+            self.logger.info(
+                set_color("Saving filtered dataset into ", "pink") + f"[{file}]"
+            )
+            with open(file, "wb") as f:
+                pickle.dump(self, f)
 
     @staticmethod
     def edge_index_to_adj_t(edge_index, edge_weight, m_num_nodes, n_num_nodes):
