@@ -74,7 +74,17 @@ class NGCF(GeneralGraphRecommender):
         if self.node_dropout == 0:
             edge_index, edge_weight = self.edge_index, self.edge_weight
         else:
-            edge_index, edge_weight = dropout_adj(edge_index=self.edge_index, edge_attr=self.edge_weight, p=self.node_dropout)
+            edge_index, edge_weight = self.edge_index, self.edge_weight
+            if self.use_sparse:
+                row, col, edge_weight = edge_index.t().coo()
+                edge_index = torch.stack([row, col], 0)
+                edge_index, edge_weight = dropout_adj(edge_index=edge_index, edge_attr=edge_weight,
+                                                      p=self.node_dropout, training=self.training)
+                from torch_sparse import SparseTensor
+                edge_index = SparseTensor(row=edge_index[0], col=edge_index[1], value=edge_weight,
+                                          sparse_sizes=(self.n_users + self.n_items, self.n_users + self.n_items))
+                edge_index = edge_index.t()
+                edge_weight = None
 
         all_embeddings = self.get_ego_embeddings()
         embeddings_list = [all_embeddings]

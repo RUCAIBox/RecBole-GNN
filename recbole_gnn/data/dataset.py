@@ -4,8 +4,13 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
+from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from torch_geometric.utils import degree
-
+try:
+    from torch_sparse import SparseTensor
+    is_sparse = True
+except ImportError:
+    is_sparse = False
 
 from recbole.data.dataset import SequentialDataset
 from recbole.data.dataset import Dataset as RecBoleDataset
@@ -33,7 +38,16 @@ class GeneralGraphDataset(RecBoleDataset):
             with open(file, "wb") as f:
                 pickle.dump(self, f)
 
-    def get_norm_adj_mat(self):
+    @staticmethod
+    def edge_index_to_adj_t(edge_index, edge_weight, m_num_nodes, n_num_nodes):
+        adj = SparseTensor(row=edge_index[0],
+                           col=edge_index[1],
+                           value=edge_weight,
+                           sparse_sizes=(m_num_nodes, n_num_nodes))
+        return adj.t()
+
+    def get_norm_adj_mat(self, enable_sparse=False):
+        self.is_sparse = is_sparse
         r"""Get the normalized interaction matrix of users and items.
         Construct the square matrix from the training data and normalize it
         using the laplace matrix.
@@ -48,11 +62,19 @@ class GeneralGraphDataset(RecBoleDataset):
         edge_index1 = torch.stack([row, col])
         edge_index2 = torch.stack([col, row])
         edge_index = torch.cat([edge_index1, edge_index2], dim=1)
+        edge_weight = torch.ones(edge_index.size(1))
+        num_nodes = self.user_num + self.item_num
 
-        deg = degree(edge_index[0], self.user_num + self.item_num)
+        if enable_sparse:
+            if not is_sparse:
+                self.logger.warning(
+                    "Import `torch_sparse` error, please install corrsponding version of `torch_sparse`. Now we will use dense edge_index instead of SparseTensor in dataset.")
+            else:
+                adj_t = self.edge_index_to_adj_t(edge_index, edge_weight, num_nodes, num_nodes)
+                adj_t = gcn_norm(adj_t, None, num_nodes, add_self_loops=False)
+                return adj_t, None
 
-        norm_deg = 1. / torch.sqrt(torch.where(deg == 0, torch.ones([1]), deg))
-        edge_weight = norm_deg[edge_index[0]] * norm_deg[edge_index[1]]
+        edge_index, edge_weight = gcn_norm(edge_index, edge_weight, num_nodes, add_self_loops=False)
 
         return edge_index, edge_weight
 
