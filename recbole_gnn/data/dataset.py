@@ -6,14 +6,32 @@ import pandas as pd
 from tqdm import tqdm
 from torch_geometric.utils import degree
 
+
 from recbole.data.dataset import SequentialDataset
 from recbole.data.dataset import Dataset as RecBoleDataset
 from recbole.utils import set_color, FeatureSource
+
+import recbole
+import pickle
+from recbole.utils import ensure_dir
 
 
 class GeneralGraphDataset(RecBoleDataset):
     def __init__(self, config):
         super().__init__(config)
+
+    if recbole.__version__ == "1.1.1":
+
+        def save(self):
+            """Saving this :class:`Dataset` object to :attr:`config['checkpoint_dir']`."""
+            save_dir = self.config["checkpoint_dir"]
+            ensure_dir(save_dir)
+            file = os.path.join(save_dir, f'{self.config["dataset"]}-{self.__class__.__name__}.pth')
+            self.logger.info(
+                set_color("Saving filtered dataset into ", "pink") + f"[{file}]"
+            )
+            with open(file, "wb") as f:
+                pickle.dump(self, f)
 
     def get_norm_adj_mat(self):
         r"""Get the normalized interaction matrix of users and items.
@@ -101,6 +119,7 @@ class SessionGraphDataset(SequentialDataset):
             dataset.session_graph_construction()
         return datasets
 
+
 class MultiBehaviorDataset(SessionGraphDataset):
 
     def session_graph_construction(self):
@@ -113,7 +132,7 @@ class MultiBehaviorDataset(SessionGraphDataset):
             # To be compatible with existing datasets
             item_behavior_seq = torch.tensor([0] * len(item_seq))
             self.behavior_id_field = 'behavior_id'
-            self.field2id_token[self.behavior_id_field] = {0:'interaction'}
+            self.field2id_token[self.behavior_id_field] = {0: 'interaction'}
         else:
             item_behavior_seq = self.inter_feat[self.item_list_length_field]
 
@@ -151,6 +170,7 @@ class MultiBehaviorDataset(SessionGraphDataset):
             'edge_index': edge_index,
             'alias_inputs': alias_inputs
         }
+
 
 class LESSRDataset(SessionGraphDataset):
     def session_graph_construction(self):
@@ -199,14 +219,14 @@ class GCEGNNDataset(SequentialDataset):
         item_seq = self.inter_feat[self.item_id_list_field]
         item_seq_len = self.inter_feat[self.item_list_length_field]
         for i in tqdm(range(item_seq.shape[0])):
-            item_seq[i,:item_seq_len[i]] = item_seq[i,:item_seq_len[i]].flip(dims=[0])
+            item_seq[i, :item_seq_len[i]] = item_seq[i, :item_seq_len[i]].flip(dims=[0])
 
     def bidirectional_edge(self, edge_index):
         seq_len = edge_index.shape[1]
         ed = edge_index.T
         ed2 = edge_index.T.flip(dims=[1])
         idc = ed.unsqueeze(1).expand(-1, seq_len, 2) == ed2.unsqueeze(0).expand(seq_len, -1, 2)
-        return torch.logical_and(idc[:,:,0], idc[:,:,1]).any(dim=-1)
+        return torch.logical_and(idc[:, :, 0], idc[:, :, 1]).any(dim=-1)
 
     def session_graph_construction(self):
         self.logger.info('Constructing session graphs.')
@@ -276,9 +296,10 @@ class SocialDataset(GeneralGraphDataset):
         net_feat (pandas.DataFrame): Internal data structure stores the users' social network relations.
             It's loaded from file ``.net``.
     """
+
     def __init__(self, config):
         super().__init__(config)
-    
+
     def _get_field_from_config(self):
         super()._get_field_from_config()
 

@@ -80,6 +80,7 @@ def objective_function(config_dict=None, config_file_list=None, saved=True):
     test_result = trainer.evaluate(test_data, load_best_model=saved)
 
     return {
+        'model': config['model'],
         'best_valid_score': best_valid_score,
         'valid_score_bigger': config['valid_metric_bigger'],
         'best_valid_result': best_valid_result,
