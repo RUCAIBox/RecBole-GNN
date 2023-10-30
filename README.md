@@ -65,11 +65,15 @@ We list currently supported models according to category:
 
 * **[NGCF](recbole_gnn/model/general_recommender/ngcf.py)** from Wang *et al.*: [Neural Graph Collaborative Filtering](https://arxiv.org/abs/1905.08108) (SIGIR 2019).
 * **[LightGCN](recbole_gnn/model/general_recommender/lightgcn.py)** from He *et al.*: [LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation](https://arxiv.org/abs/2002.02126) (SIGIR 2020).
+* **[SSL4Rec](recbole_gnn/model/general_recommender/ssl4rec.py)** from Yao *et al.*: [Self-supervised Learning for Large-scale Item Recommendations](https://arxiv.org/abs/2007.12865) (CIKM 2021).
 * **[SGL](recbole_gnn/model/general_recommender/sgl.py)** from Wu *et al.*: [Self-supervised Graph Learning for Recommendation](https://arxiv.org/abs/2010.10783) (SIGIR 2021).
 * **[HMLET](recbole_gnn/model/general_recommender/hmlet.py)** from Kong *et al.*: [Linear, or Non-Linear, That is the Question!](https://arxiv.org/abs/2111.07265) (WSDM 2022).
 * **[NCL](recbole_gnn/model/general_recommender/ncl.py)** from Lin *et al.*: [Improving Graph Collaborative Filtering with Neighborhood-enriched Contrastive Learning](https://arxiv.org/abs/2202.06200) (TheWebConf 2022).
+* **[DirectAU](recbole_gnn/model/general_recommender/directau.py)** from Wang *et al.*: [Towards Representation Alignment and Uniformity in Collaborative Filtering](https://arxiv.org/abs/2206.12811) (KDD 2022).
 * **[SimGCL](recbole_gnn/model/general_recommender/simgcl.py)** from Yu *et al.*: [Are Graph Augmentations Necessary? Simple Graph Contrastive Learning for Recommendation](https://arxiv.org/abs/2112.08679) (SIGIR 2022).
 * **[XSimGCL](recbole_gnn/model/general_recommender/xsimgcl.py)** from Yu *et al.*: [XSimGCL: Towards Extremely Simple Graph Contrastive Learning for Recommendation](https://arxiv.org/abs/2209.02544) (TKDE 2023).
+* **[LightGCL](recbole_gnn/model/general_recommender/lightgcl.py)** from Cai *et al.*: [LightGCL: Simple Yet Effective Graph Contrastive Learning for Recommendation
+](https://arxiv.org/abs/2302.08191) (ICLR 2023).
 
 **Sequential Recommendation**:
 
