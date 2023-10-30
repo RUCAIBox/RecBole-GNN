@@ -1,0 +1,6 @@
+embedding_size: 64
+drop_ratio: 0.1
+tau: 0.1
+reg_weight: 1e-04
+ssl_weight: 1e-05
+require_pow: True

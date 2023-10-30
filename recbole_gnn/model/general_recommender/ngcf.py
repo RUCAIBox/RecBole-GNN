@@ -85,6 +85,9 @@ class NGCF(GeneralGraphRecommender):
                                           sparse_sizes=(self.n_users + self.n_items, self.n_users + self.n_items))
                 edge_index = edge_index.t()
                 edge_weight = None
+            else:
+                edge_index, edge_weight = dropout_adj(edge_index=edge_index, edge_attr=edge_weight,
+                                                      p=self.node_dropout, training=self.training)
 
         all_embeddings = self.get_ego_embeddings()
         embeddings_list = [all_embeddings]
