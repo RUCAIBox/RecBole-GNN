@@ -4,6 +4,18 @@
 
 -----
 
+*Updates*:
+
+* [Oct 29, 2023] Add [SSL4Rec](https://github.com/RUCAIBox/RecBole-GNN/blob/main/recbole_gnn/model/general_recommender/ssl4rec.py). (https://github.com/RUCAIBox/RecBole-GNN/pull/76, by [@downeykking](https://github.com/downeykking))
+* [Oct 23, 2023] Add sparse tensor support, accelerating LightGCN & NGCF by ~5x, with 1/6 GPU memories. (https://github.com/RUCAIBox/RecBole-GNN/pull/75, by [@downeykking](https://github.com/downeykking))
+* [Oct 20, 2023] Add [DirectAU](https://github.com/RUCAIBox/RecBole-GNN/blob/main/recbole_gnn/model/general_recommender/directau.py). (https://github.com/RUCAIBox/RecBole-GNN/pull/74, by [@downeykking](https://github.com/downeykking))
+* [Oct 16, 2023] Add [XSimGCL](https://github.com/RUCAIBox/RecBole-GNN/blob/main/recbole_gnn/model/general_recommender/xsimgcl.py). (https://github.com/RUCAIBox/RecBole-GNN/pull/72, by [@downeykking](https://github.com/downeykking))
+* [Apr 12, 2023] Add [LightGCL](https://github.com/RUCAIBox/RecBole-GNN/blob/main/recbole_gnn/model/general_recommender/lightgcl.py). (https://github.com/RUCAIBox/RecBole-GNN/pull/63, by [@wending0417](https://github.com/wending0417))
+* [Oct 29, 2022] Adaptation to RecBole 1.1.1. (https://github.com/RUCAIBox/RecBole-GNN/pull/53)
+* [Jun 15, 2022] Add [MultiBehaviorDataset](https://github.com/RUCAIBox/RecBole-GNN/blob/8c61463451b294dce9af2d1939a5e054f7955e0f/recbole_gnn/data/dataset.py#L145). (https://github.com/RUCAIBox/RecBole-GNN/pull/43, by [@Tokkiu](https://github.com/Tokkiu))
+
+-----
+
 **RecBole-GNN** is a library built upon [PyTorch](https://pytorch.org) and [RecBole](https://github.com/RUCAIBox/RecBole) for reproducing and developing recommendation algorithms based on graph neural networks (GNNs). Our library includes algorithms covering three major categories:
 * **General Recommendation** with user-item interaction graphs;
 * **Sequential Recommendation** with session/sequence graphs;
@@ -95,7 +107,7 @@ With the sequential/session graphs preprocessing technique, as well as efficient
 
 ## The Team
 
-RecBole-GNN is developed and maintained by members from [RUCAIBox](http://aibox.ruc.edu.cn/), the main developers are Yupeng Hou ([@hyp1231](https://github.com/hyp1231)), Lanling Xu ([@Sherry-XLL](https://github.com/Sherry-XLL)) and Changxin Tian ([@ChangxinTian](https://github.com/ChangxinTian)).
+RecBole-GNN is initially developed and maintained by members from [RUCAIBox](http://aibox.ruc.edu.cn/), the main developers are Yupeng Hou ([@hyp1231](https://github.com/hyp1231)), Lanling Xu ([@Sherry-XLL](https://github.com/Sherry-XLL)) and Changxin Tian ([@ChangxinTian](https://github.com/ChangxinTian)). We also thank Xinzhou ([@downeykking](https://github.com/downeykking)), Wanli ([@wending0417](https://github.com/wending0417)), and Jingqi ([@Tokkiu](https://github.com/Tokkiu)) for their great contribution! ❤️
 
 ## Acknowledgement
 
